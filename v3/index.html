@@ -543,6 +543,8 @@
             display: flex;
             flex-direction: column;
             background: var(--toolbar-bg);
+            min-height: 0;
+            overflow: hidden;
         }
 
         .canvas-toolbar {
@@ -1101,7 +1103,7 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background: #fafbfc;
+            background: var(--panel-bg);
             padding: 16px 20px;
             overflow: auto;
             font-family: var(--font-main);
@@ -5870,19 +5872,20 @@
                         isCustom: true,
                         poly: [
                             { x: slab.x1, y: slab.y1 },
-                            { x: slab.x2, y: sla                                    { x: slab.x2, y: slab.y2 },
-                            { 1, y: slab.y2 }
+                            { x: slab.x2, y: slab.y1 },
+                            { x: slab.x2, y: slab.y2 },
+                            { x: slab.x1, y: slab.y2 }
                         ],
-                        cx: + slab.x2) / 2,
+                        cx: (slab.x1 + slab.x2) / 2,
                         cy: (slab.y1 + slab.y2) / 2
-                });
+                    });
 
-                console.log(`v3.0:         eam ${cb.beamId} receives ${tributaryArea.toFixed(2)          slab ${ slab.id }`);
+                    console.log(`v3.0: Custom beam ${cb.beamId} receives ${tributaryArea.toFixed(2)} m² from slab ${slab.id}`);
                 }
             }
 
-            // v3.         bute cantilever slab loads to beams
-            // Load goes          he main grid edge beam, and (2) the cantilever beams
+            // v3.0: Distribute cantilever slab loads to beams
+            // Load goes to (1) the main grid edge beam, and (2) the cantilever beams
             // v3.0 FIX: Skip voided cantilever slabs - they shouldn't contribute load
             for (let slab of state.slabs.filter(s => s.isCantilever && !s.isVoid)) {
                 const edge = slab.cantileverEdge;
@@ -9723,8 +9726,8 @@
                 meshes3D.push(line);
 
                 // Bubble label at bottom of grid line
-                const label = createGridLabel(xLabels[i        + 1)         ());
-                label.position.         05, offsetZ - 1.5);
+                const label = createGridLabel(xLabels[i] || (i + 1).toString());
+                label.position.set(x, 0.05, offsetZ - 1.5);
                 scene3D.add(label);
                 meshes3D.push(label);
 
@@ -9802,7 +9805,8 @@
                 container3D.classList.remove('active');
                 btn2D?.classList.add('active');
                 btn3D?.classList.remove('active');
-                se {                 canvas2D.style.display         ;
+            } else {
+                canvas2D.style.display = 'none';
                 // v3.9 FIX: Clear inline display style set by setPlanTab so class takes effect
                 container3D.style.display = '';
                 container3D.classList.add('active');
@@ -9940,7 +9944,8 @@
          * Save current project to JSON file
          */
         function saveProject() {
-            try                   // Collect saveable state
+            try {
+                // Collect saveable state
                 const projectData = {
                     version: '2.8',
                     savedAt: new Date().toISOString(),
@@ -10813,10 +10818,10 @@ function checkTorsion() {
         const ok = Tu < Tcr;
 
         html += '<tr>' +
-            '<td>' +        d ||         </td>' +
-            '<td>' + b + 'x'          td>' +
+            '<td>' + (beam.id || '-') + '</td>' +
+            '<td>' + b + 'x' + h + '</td>' +
             '<td>' + Acp + '</td>' +
-            '<td>'         '</td>' +
+            '<td>' + Pcp + '</td>' +
             '<td>' + Tcr.toFixed(2) + '</td>' +
             '<td>' + Tu.toFixed(2) + '</td>' +
             '<td style="font-weight:bold;' + (ok ? 'color:green;' : 'color:#d97706;') + '">' + (ok ? 'Negligible' : 'Design Required') + '</td>' +
@@ -11218,7 +11223,8 @@ function populateDuctileDetailing() {
             const zone = 2 * g.h; // confinement zone = 2h from face
             const mainDia = g.h >= 500 ? 20 : 16;
             const sConf = Math.min(Math.floor(g.h / 4), 8 * mainDia, 24 * 10, 200);
-                     d = Math.min(Math.floor(g.h / 2), 2                  html += '<tr>' +
+            const sMid = Math.min(Math.floor(g.h / 2), 200);
+            html += '<tr>' +
                 '<td>B-' + g.b + 'x' + g.h + ' (x' + g.count + ')</td>' +
                 '<td>' + g.b + 'x' + g.h + '</td>' +
                 '<td>' + zone + 'mm</td>' +
@@ -11781,8 +11787,9 @@ function designAllSlabs() {
         const wu = 1.2 * ((t / 1000 * 24) + (floor?.dlSuper || 2.0)) + 1.6 * (floor?.liveLoad || 2.0);
         let Mu;
         if (type === 'One-Way') {
-            Mu = (wu * Lx * Lx) /         .m/m         } else {
-            Mu = (          Lx) / 10; // approximate for two-way
+            Mu = (wu * Lx * Lx) / 8; // kN.m/m
+        } else {
+            Mu = (wu * Lx * Lx) / 10; // approximate for two-way
         }
 
         const Rn = (Mu * 1e6) / (0.9 * 1000 * d * d);
@@ -11872,8 +11879,8 @@ function calculateWaterTank() {
     html += '<tr><td>Water Weight</td><td>' + waterWeight.toFixed(1) + '</td><td>kN</td></tr>';
     html += '<tr><td>Tank Self-Weight (~15%)</td><td>' + tankSelfWeight.toFixed(1) + '</td><td>kN</td></tr>';
     html += '<tr><td>Total Weight</td><td>' + totalWeight.toFixed(1) + '</td><td>kN</td></tr>';
-    html += '<tr style="border-top:1px solid #ccc;"><td>Support Points</td><td>' + nSupports + '</td><td>columns</td        
-            '<tr><td>Point Load (service)</td><         intLoad.toFixed(1) + '</td><td>kN</td></tr>';
+    html += '<tr style="border-top:1px solid #ccc;"><td>Support Points</td><td>' + nSupports + '</td><td>columns</td></tr>';
+    html += '<tr><td>Point Load (service)</td><td>' + pointLoad.toFixed(1) + '</td><td>kN</td></tr>';
     if (location === 'roof') {
         html += '<tr><td>Seismic Factor (Fp)</td><td>' + seismicFactor.toFixed(1) + '</td><td></td></tr>';
     }
@@ -12289,7 +12296,7 @@ function populateBOM() {
             const getNodeId = (colIdx, floorIdx) => (floorIdx * 1000) + colIdx + 1;
             const existingNodes = new Set();
             const columnMembers = [];
-                    amMe         ];
+            const beamMembers = [];
             const wallLoads = [];
             let memId = 1;
 
@@ -12516,7 +12523,7 @@ function populateBOM() {
             }
         }
 
-         / ================================================================
+        // ================================================================
         //  ETABS EXPORT (.e2k)
         //  Compatible with ETABS v18+
         // ================================================================
@@ -13761,8 +13768,8 @@ ${ column }=IFCCOLUMN('${generateIFCGUID()}', ${ ownerHistoryId }, '${col.id}', 
                 // Vertical beam: position is X, beam runs along Y
                 pos = xCoords[refIdx] + offset;
                 start = yCoords[fromSpan];
-                end = yCoords[toSp 1];
-                x1 =  = start; x2 = pos; y2 = end;
+                end = yCoords[toSpan + 1];
+                x1 = pos; y1 = start; x2 = pos; y2 = end;
             }
 
             // Create custom beam object
