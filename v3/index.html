@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="blueprint">
+<html lang="en" data-theme="dark">
 
 <head>
     <meta charset="UTF-8">
@@ -7,7 +7,7 @@
     <title>FutolStructure | Structural Engineering</title>
     <style>
         /* ========== GOOGLE FONTS ========== */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
 
         /* ========== RESET & VARIABLES ========== */
         * {
@@ -16,341 +16,128 @@
             box-sizing: border-box;
         }
 
-        /* MIDNIGHT THEME - Paper Matte Inversion (Canvas stays light) */
+        /* ========== PROFESSIONAL DARK THEME (ETABS/STAAD-inspired) ========== */
         :root,
         [data-theme="dark"] {
             --font-main: 'Inter', system-ui, -apple-system, sans-serif;
-            --primary: #ffffff;
-            /* White */
-            --secondary: #cccccc;
-            /* Light Gray */
-            --dark-bg: #0a0a0f;
-            /* Dark panels */
-            --panel-bg: #0a0a0f;
-            /* Dark panels */
-            --surface: #1a1a1f;
-            /* Dark surface */
-            --glass: rgba(255, 255, 255, 0.03);
-            --glass-darker: rgba(255, 255, 255, 0.05);
-            --border: rgba(255, 255, 255, 0.2);
-            /* White borders */
-            --text-primary: #ffffff;
-            /* White text */
-            --text-muted: #999999;
-            /* Light Gray muted */
-            --success: #cccccc;
-            --warning: #cccccc;
-            --danger: #cccccc;
-            /* Canvas stays LIGHT like Paper Matte */
-            --canvas-bg: #f5f5f0;
-            --header-bg: #0a0a0f;
-            --input-bg: rgba(255, 255, 255, 0.1);
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --primary: #4a9eff;
+            --primary-dim: #2d6bc4;
+            --secondary: #6c8ebf;
+            --accent: #f0a030;
+            --dark-bg: #1b1e24;
+            --panel-bg: #22262e;
+            --surface: #2a2f38;
+            --surface-hover: #323842;
+            --glass: rgba(255, 255, 255, 0.04);
+            --glass-darker: rgba(255, 255, 255, 0.06);
+            --border: #3a3f4a;
+            --border-light: #4a5060;
+            --text-primary: #e0e4ea;
+            --text-secondary: #a0a8b8;
+            --text-muted: #6a7080;
+            --success: #3ddc84;
+            --warning: #f0a030;
+            --danger: #e05050;
+            --canvas-bg: #f8f9fa;
+            --header-bg: #1b1e24;
+            --input-bg: #2a2f38;
+            --toolbar-bg: #262a32;
+            --tab-active-bg: #4a9eff;
+            --tab-active-text: #ffffff;
+            --ribbon-bg: #22262e;
+            --ribbon-border: #3a3f4a;
+            --status-bg: #1b1e24;
+            --group-bg: rgba(255,255,255,0.03);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.3);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.4);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.5);
         }
 
-        /* LIGHT THEME (Clean Professional) - WCAG Compliant High Contrast */
+        /* ========== LIGHT THEME (Professional CAD) ========== */
         [data-theme="light"] {
-            --font-main: 'Outfit', system-ui, -apple-system, sans-serif;
-            --primary: #1d4ed8;
-            --secondary: #7c3aed;
-            --dark-bg: #f8fafc;
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --primary: #2563eb;
+            --primary-dim: #1d4ed8;
+            --secondary: #6366f1;
+            --accent: #d97706;
+            --dark-bg: #f1f3f5;
             --panel-bg: #ffffff;
-            --surface: #f1f5f9;
-            --glass: rgba(15, 23, 42, 0.03);
-            --glass-darker: rgba(15, 23, 42, 0.06);
-            --border: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-muted: #475569;
+            --surface: #f8f9fa;
+            --surface-hover: #e9ecef;
+            --glass: rgba(0, 0, 0, 0.02);
+            --glass-darker: rgba(0, 0, 0, 0.04);
+            --border: #dee2e6;
+            --border-light: #e9ecef;
+            --text-primary: #1a1d23;
+            --text-secondary: #495057;
+            --text-muted: #868e96;
             --success: #16a34a;
-            --warning: #ca8a04;
+            --warning: #d97706;
             --danger: #dc2626;
-            --canvas-bg: #f8fafc;
+            --canvas-bg: #ffffff;
             --header-bg: #ffffff;
-            --input-bg: #f1f5f9;
-            /* High contrast button colors */
-            --btn-text: #1e293b;
-            --btn-border: #cbd5e1;
-            --btn-hover: #1d4ed8;
+            --input-bg: #f8f9fa;
+            --toolbar-bg: #f1f3f5;
+            --tab-active-bg: #2563eb;
+            --tab-active-text: #ffffff;
+            --ribbon-bg: #ffffff;
+            --ribbon-border: #dee2e6;
+            --status-bg: #f1f3f5;
+            --group-bg: rgba(0,0,0,0.02);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
         }
 
-        /* PAPER MATTE THEME (Engineering - Monochrome) */
+        /* ========== BLUEPRINT THEME (Engineering Paper) ========== */
         [data-theme="blueprint"] {
-            --font-main: 'Inter', 'Courier New', system-ui, -apple-system, sans-serif;
-            --primary: #000000;
-            /* Black */
-            --secondary: #333333;
-            /* Dark Gray */
-            --dark-bg: #f5f5f0;
-            /* Off-White Paper */
-            --panel-bg: #f5f5f0;
-            /* Off-White Panels */
+            --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Consolas', monospace;
+            --primary: #1e3a5f;
+            --primary-dim: #15294a;
+            --secondary: #2c5282;
+            --accent: #c05621;
+            --dark-bg: #f5f5ef;
+            --panel-bg: #fafaf5;
             --surface: #ffffff;
-            /* White surface */
-            --glass: rgba(0, 0, 0, 0.03);
-            --glass-darker: rgba(0, 0, 0, 0.05);
-            --border: rgba(0, 0, 0, 0.2);
-            /* Black borders */
-            --text-primary: #000000;
-            /* Black text */
-            --text-muted: #666666;
-            /* Gray muted */
-            --success: #333333;
-            /* Dark Gray (was green) */
-            --warning: #333333;
-            /* Dark Gray (was orange) */
-            --danger: #333333;
-            /* Dark Gray (was red) */
-            --canvas-bg: #f5f5f0;
-            /* Off-White canvas */
-            --header-bg: #f5f5f0;
-            /* Off-White header */
-            --input-bg: transparent;
+            --surface-hover: #f0f0ea;
+            --glass: rgba(0, 0, 0, 0.02);
+            --glass-darker: rgba(0, 0, 0, 0.04);
+            --border: #c8c8be;
+            --border-light: #d8d8ce;
+            --text-primary: #1a1a18;
+            --text-secondary: #4a4a45;
+            --text-muted: #8a8a82;
+            --success: #2d6a4f;
+            --warning: #92400e;
+            --danger: #991b1b;
+            --canvas-bg: #f0f0e8;
+            --header-bg: #fafaf5;
+            --input-bg: #ffffff;
+            --toolbar-bg: #f0f0e8;
+            --tab-active-bg: #1e3a5f;
+            --tab-active-text: #ffffff;
+            --ribbon-bg: #fafaf5;
+            --ribbon-border: #c8c8be;
+            --status-bg: #f0f0e8;
+            --group-bg: rgba(0,0,0,0.02);
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 2px 8px rgba(0,0,0,0.08);
+            --shadow-lg: 0 4px 16px rgba(0,0,0,0.1);
         }
 
-        /* Paper Matte Button Overrides */
-        [data-theme="blueprint"] .tool-btn,
-        [data-theme="blueprint"] .action-btn,
-        [data-theme="blueprint"] .view-btn,
-        [data-theme="blueprint"] .plan-tab,
-        [data-theme="blueprint"] .floor-tab,
-        [data-theme="blueprint"] .layer-btn,
-        [data-theme="blueprint"] .add-span-btn {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        [data-theme="blueprint"] .tool-btn:hover,
-        [data-theme="blueprint"] .action-btn:hover,
-        [data-theme="blueprint"] .view-btn:hover {
-            background: #f0f0f0 !important;
-            color: #000000 !important;
-        }
-
-        [data-theme="blueprint"] .tool-btn.active,
-        [data-theme="blueprint"] .action-btn.active,
-        [data-theme="blueprint"] .view-btn.active,
-        [data-theme="blueprint"] .plan-tab.active,
-        [data-theme="blueprint"] .floor-tab.active,
-        [data-theme="blueprint"] .layer-btn.active {
-            background: #e8eef4 !important;
-            /* Pastel Gray-Blue */
-            color: #1e3a5f !important;
-            /* Navy Blue text */
-            border-color: #1e3a5f !important;
-            /* Navy Blue border */
-            font-weight: 600 !important;
-        }
-
-        /* Paper Matte - Strip ALL Remaining Colors */
-        /* Remove span buttons (red X) - make black */
-        [data-theme="blueprint"] .remove-span-btn,
-        [data-theme="blueprint"] .remove-floor-btn,
-        [data-theme="blueprint"] button[onclick*="removeSpan"],
-        [data-theme="blueprint"] button[onclick*="removeFloor"] {
-            background: transparent !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-
-        /* Checkboxes - black accent */
-        [data-theme="blueprint"] input[type="checkbox"] {
-            accent-color: #000000 !important;
-        }
-
-        /* All labels and headings - UPPERCASE + Black */
-        [data-theme="blueprint"] .panel-header,
-        [data-theme="blueprint"] h3,
-        [data-theme="blueprint"] .param-group h3,
-        [data-theme="blueprint"] .result-label,
-        [data-theme="blueprint"] label,
-        [data-theme="blueprint"] .settings-label,
-        [data-theme="blueprint"] .settings-header span {
-            text-transform: uppercase !important;
-            color: #000000 !important;
-        }
-
-        /* Theme toggle buttons */
-        [data-theme="blueprint"] .theme-option {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-            text-transform: uppercase !important;
-        }
-
-        [data-theme="blueprint"] .theme-option.active {
-            background: #000000 !important;
-            color: #ffffff !important;
-        }
-
-        /* Badges - monochrome */
-        [data-theme="blueprint"] .typical-badge,
-        [data-theme="blueprint"] [class*="badge"] {
-            background: #333333 !important;
-            color: #ffffff !important;
-            border: none !important;
-        }
-
-        /* Info icons - black/gray */
-        [data-theme="blueprint"] .info-icon,
-        [data-theme="blueprint"] [class*="info"] {
-            color: #666666 !important;
-        }
-
-        /* Footer - white bg, black text */
-        [data-theme="blueprint"] footer,
-        [data-theme="blueprint"] .footer {
-            background: #f5f5f0 !important;
-            color: #000000 !important;
-        }
-
-        /* AI Button - hide or make monochrome */
-        [data-theme="blueprint"] .ai-fab,
-        [data-theme="blueprint"] .ai-button,
-        [data-theme="blueprint"] [class*="ai-"] {
-            background: #000000 !important;
-            color: #ffffff !important;
-        }
-
-        /* Load Summary and Result Cards - white bg */
-        [data-theme="blueprint"] .load-summary,
-        [data-theme="blueprint"] .result-card,
-        [data-theme="blueprint"] .result-box,
-        [data-theme="blueprint"] [class*="result"] {
-            background: #ffffff !important;
-            border: 1px solid #000000 !important;
-            color: #000000 !important;
-        }
-
-        /* Status labels (corner/edge) - black text */
-        [data-theme="blueprint"] .column-type,
-        [data-theme="blueprint"] [class*="type-"],
-        [data-theme="blueprint"] [class*="status"] {
-            color: #000000 !important;
-            background: transparent !important;
-        }
-
-        /* Input fields - white bg, black border */
-        [data-theme="blueprint"] input,
-        [data-theme="blueprint"] select,
-        [data-theme="blueprint"] textarea {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-
-        /* Panel background - off-white */
-        [data-theme="blueprint"] .panel,
-        [data-theme="blueprint"] .results-panel {
-            background: #f5f5f0 !important;
-        }
-
-        /* Override any remaining colored gradients */
-        [data-theme="blueprint"] [style*="gradient"],
-        [data-theme="blueprint"] [style*="background:"] {
-            --any-color-override: inherit;
-        }
-
-        /* Paper Matte - Override ALL inline styles with colors */
-        [data-theme="blueprint"] *[style*="color:"],
-        [data-theme="blueprint"] *[style*="background"] {
-            color: #000000 !important;
-            background: transparent !important;
-        }
-
-        /* Grand Total highlight - white bg */
-        [data-theme="blueprint"] .grand-total,
-        [data-theme="blueprint"] .total-value,
-        [data-theme="blueprint"] [class*="grand"],
-        [data-theme="blueprint"] [class*="total"] {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-        }
-
-        /* Summary cards - white bg, black text */
-        [data-theme="blueprint"] .summary-card,
-        [data-theme="blueprint"] .summary-grid .value,
-        [data-theme="blueprint"] .summary-grid .label {
-            background: #ffffff !important;
-            color: #000000 !important;
-        }
-
-        /* AI Fab button - make black or hide */
-        [data-theme="blueprint"] #ai-fab,
-        [data-theme="blueprint"] .ai-fab,
-        [data-theme="blueprint"] .ethos-button,
-        [data-theme="blueprint"] [id*="ethos"],
-        [data-theme="blueprint"] [class*="ethos"] {
-            background: #000000 !important;
-            color: #ffffff !important;
-            border: 1px solid #000000 !important;
-        }
-
-        /* Footer - white bg, black text */
-        [data-theme="blueprint"] .status-bar,
-        [data-theme="blueprint"] [class*="footer"],
-        [data-theme="blueprint"] .credits {
-            background: #f5f5f0 !important;
-            color: #000000 !important;
-        }
-
-        [data-theme="blueprint"] .status-bar a,
-        [data-theme="blueprint"] .credits a {
-            color: #000000 !important;
-            text-decoration: underline !important;
-        }
-
-        /* Column type labels - black text */
-        [data-theme="blueprint"] .col-type,
-        [data-theme="blueprint"] td span[style*="color"] {
-            color: #000000 !important;
-        }
-
-        /* Override ALL span colors in results */
-        [data-theme="blueprint"] .results td span,
-        [data-theme="blueprint"] .column-table span {
-            color: #000000 !important;
-        }
-
-        /* Paper Matte - Remove ALL gray/black backgrounds from toolbars */
-        [data-theme="blueprint"] .plan-tabs,
-        [data-theme="blueprint"] .view-toggle,
-        [data-theme="blueprint"] .layer-toggles,
-        [data-theme="blueprint"] .canvas-toolbar {
-            background: transparent !important;
-        }
-
-        /* Paper Matte - Remove gray backgrounds from param groups and span inputs */
-        [data-theme="blueprint"] .param-group,
-        [data-theme="blueprint"] .span-inputs,
-        [data-theme="blueprint"] .floor-group,
-        [data-theme="blueprint"] .span-input,
-        [data-theme="blueprint"] .cantilever-span-input,
-        [data-theme="blueprint"] [class*="span-"] {
-            background: transparent !important;
-        }
-
-        /* Paper Matte - Make layer buttons and plan tabs have just black border */
-        [data-theme="blueprint"] .layer-btn,
-        [data-theme="blueprint"] .plan-tab,
-        [data-theme="blueprint"] .view-btn {
-            background: #ffffff !important;
-            color: #000000 !important;
-            border: 1px solid #000000 !important;
-            text-transform: uppercase !important;
-        }
-
-        /* Paper Matte - Canvas Grid Mesh Background (50cm x 50cm pattern) */
-        /* Animated Gradient for "passing lights" effect */
-        [data-theme="blueprint"] .canvas-wrapper,
-        [data-theme="blueprint"] #mainCanvas {
-            background-color: #e2e8f0 !important;
-            /* Slightly darker white (Slate-200) */
-            position: relative;
+        /* ========== BASE STYLES ========== */
+        body {
+            font-family: var(--font-main);
+            background: var(--dark-bg);
+            min-height: 100vh;
+            color: var(--text-primary);
             overflow: hidden;
-            /* Contain the animation */
+            font-size: 13px;
+            line-height: 1.4;
+            -webkit-font-smoothing: antialiased;
         }
 
         canvas {
@@ -358,186 +145,67 @@
             background: transparent;
             position: relative;
             z-index: 10;
-            /* Force Canvas Above Animation */
         }
 
-        /* Subtle "passing lights" animation */
-        [data-theme="blueprint"] .canvas-wrapper::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 200%;
-            height: 100%;
-            background: linear-gradient(90deg,
-                    transparent 30%,
-                    rgba(255, 255, 255, 0.6) 50%,
-                    transparent 70%);
-            transform: skewX(-20deg);
-            animation: lightSweep 12s infinite linear;
-            pointer-events: none;
-            z-index: 0;
-            /* Behind canvas (since canvas is transparent) */
-        }
-
-        @keyframes lightSweep {
-            0% {
-                transform: translateX(-50%) skewX(-20deg);
-            }
-
-            100% {
-                transform: translateX(50%) skewX(-20deg);
-            }
-        }
-
-        /* Dropdown Menu Styles */
-        .settings-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            background: var(--panel-bg);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 8px;
-            min-width: 180px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-            z-index: 2000;
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .settings-dropdown.hidden {
-            display: none;
-        }
-
-        [data-theme="blueprint"] .settings-dropdown {
-            background: #ffffff !important;
-            border: 1px solid #000000 !important;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .menu-item-header {
-            font-size: 0.65rem;
-            color: var(--text-muted);
-            margin: 4px 0 2px 4px;
-            font-weight: 600;
-        }
-
-        [data-theme="blueprint"] .menu-item-header {
-            color: #888;
-            text-transform: uppercase;
-        }
-
-        .menu-item {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            padding: 8px 12px;
-            text-align: left;
-            cursor: pointer;
-            border-radius: 4px;
-            font-size: 0.85rem;
-        }
-
-        .menu-item:hover {
-            background: rgba(255, 255, 255, 0.1);
-        }
-
-        [data-theme="blueprint"] .menu-item {
-            color: #000000 !important;
-            font-weight: 500;
-        }
-
-        [data-theme="blueprint"] .menu-item:hover {
-            background: #f0f0f0 !important;
-        }
-
-        /* Paper Matte - Uniform font size */
-        [data-theme="blueprint"] .panel,
-        [data-theme="blueprint"] .results-panel,
-        [data-theme="blueprint"] label,
-        [data-theme="blueprint"] input,
-        [data-theme="blueprint"] button,
-        [data-theme="blueprint"] .tool-btn,
-        [data-theme="blueprint"] .layer-btn,
-        [data-theme="blueprint"] .plan-tab {
-            font-size: 0.75rem !important;
-        }
-
-
-        body {
-            font-family: var(--font-main);
-            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--surface) 50%, var(--dark-bg) 100%);
-            min-height: 100vh;
-            color: var(--text-primary);
-            overflow-x: hidden;
-            font-size: 14px;
-        }
-
-        /* Scrollbar styles for dark theme */
+        /* ========== SCROLLBAR ========== */
         ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
         }
 
         ::-webkit-scrollbar-track {
-            background: var(--panel-bg);
+            background: transparent;
         }
 
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
+            background: var(--border);
+            border-radius: 3px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.25);
+            background: var(--border-light);
         }
 
         /* ========== HEADER ========== */
         .header {
             background: var(--header-bg);
-            backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border);
-            padding: 8px 16px;
-            height: 60px;
+            padding: 0 12px;
+            height: 44px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: nowrap;
-            gap: 16px;
+            gap: 12px;
             position: sticky;
             top: 0;
             z-index: 100;
-            overflow-x: auto;
-            white-space: nowrap;
-        }
-
-        /* Dark theme header - simple inverted border (no glows) */
-        [data-theme="dark"] .header {
-            border-bottom: 1px solid var(--border);
+            overflow: visible;
         }
 
         .logo {
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            flex-shrink: 0;
         }
 
         .logo-icon {
-            width: 36px;
-            height: 36px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-radius: 8px;
+            width: 28px;
+            height: 28px;
+            background: var(--primary);
+            border-radius: 6px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 14px;
+            color: #fff;
         }
 
         .logo h1 {
-            font-size: 1.2rem;
+            font-size: 0.95rem;
             font-weight: 600;
+            letter-spacing: -0.01em;
         }
 
         .logo h1 span {
@@ -545,34 +213,35 @@
         }
 
         .version-badge {
-            background: var(--secondary);
-            color: white;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.65rem;
-            font-weight: 600;
-            margin-left: 8px;
+            background: var(--surface);
+            color: var(--text-secondary);
+            padding: 1px 6px;
+            border-radius: 3px;
+            font-size: 0.6rem;
+            font-weight: 500;
+            border: 1px solid var(--border);
+            margin-left: 6px;
         }
 
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 4px;
             flex-wrap: nowrap;
         }
 
-        /* ========== SETTINGS PANEL ========== */
+        /* ========== SETTINGS PANEL & DROPDOWN ========== */
         .settings-panel {
             position: absolute;
-            top: 70px;
-            right: 20px;
+            top: 50px;
+            right: 12px;
             background: var(--panel-bg);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 16px;
+            border-radius: 6px;
+            padding: 12px;
             z-index: 200;
-            min-width: 220px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
         }
 
         .settings-panel.hidden {
@@ -583,9 +252,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             color: var(--text-primary);
         }
 
@@ -594,8 +263,54 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.9rem;
+            padding: 2px;
+        }
+
+        .settings-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--panel-bg);
+            border: 1px solid var(--border);
+            border-radius: 6px;
             padding: 4px;
+            min-width: 200px;
+            box-shadow: var(--shadow-lg);
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+        }
+
+        .settings-dropdown.hidden {
+            display: none;
+        }
+
+        .menu-item-header {
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin: 6px 0 2px 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .menu-item {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            padding: 7px 10px;
+            text-align: left;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 0.78rem;
+            font-family: var(--font-main);
+            transition: background 0.1s;
+        }
+
+        .menu-item:hover {
+            background: var(--surface-hover);
         }
 
         .settings-close:hover {
@@ -603,62 +318,64 @@
         }
 
         .settings-section {
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .settings-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .theme-toggle-group {
             display: flex;
-            gap: 8px;
+            gap: 4px;
         }
 
         .theme-option {
             flex: 1;
-            padding: 10px 12px;
+            padding: 7px 8px;
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 6px;
+            border-radius: 4px;
             color: var(--text-muted);
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
+            font-family: var(--font-main);
         }
 
         .theme-option:hover {
-            background: var(--glass);
+            background: var(--surface-hover);
             color: var(--text-primary);
         }
 
         .theme-option.active {
             background: var(--primary);
-            color: white;
+            color: #fff;
             border-color: var(--primary);
         }
 
         .settings-gear {
-            font-size: 1rem;
+            font-size: 0.85rem;
         }
 
         /* ========== MAIN LAYOUT ========== */
         .app-container {
             display: grid;
-            grid-template-columns: 300px 1fr 320px;
-            height: calc(100vh - 60px);
+            grid-template-columns: 280px 1fr 300px;
+            height: calc(100vh - 44px - 24px);
         }
 
         .panel {
-            background: var(--glass);
+            background: var(--panel-bg);
             border-right: 1px solid var(--border);
-            padding: 16px;
+            padding: 10px 12px;
             overflow-y: auto;
+            overflow-x: hidden;
         }
 
         .panel:last-child {
@@ -667,240 +384,201 @@
         }
 
         .panel-header {
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            color: #8b949e;
-            margin-bottom: 16px;
+            letter-spacing: 1.2px;
+            color: var(--text-muted);
+            margin-bottom: 12px;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
         }
 
         /* ========== INPUT GROUPS ========== */
         .param-group {
-            background: rgba(0, 0, 0, 0.2);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 12px;
+            background: var(--group-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
         }
 
         .param-group h3 {
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             color: var(--primary);
-            margin-bottom: 10px;
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .param-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
+            gap: 6px;
         }
 
         .param-item {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 10px;
-            border-radius: 8px;
+            background: var(--surface);
+            padding: 6px 8px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
         }
 
         .param-item label {
             display: block;
-            font-size: 0.7rem;
-            color: #8b949e;
-            margin-bottom: 4px;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            margin-bottom: 3px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .param-item input,
         .param-item select {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--input-bg);
             border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 8px;
-            color: #fff;
-            font-size: 0.85rem;
+            border-radius: 3px;
+            padding: 5px 6px;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+            transition: border-color 0.15s;
         }
 
         .param-item input:focus {
             outline: none;
             border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(74, 158, 255, 0.15);
         }
 
         /* ========== SPAN INPUTS ========== */
         .span-container {
-            margin-bottom: 12px;
+            margin-bottom: 8px;
         }
 
         .span-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .span-header h4 {
-            font-size: 0.75rem;
-            color: #8b949e;
+            font-size: 0.68rem;
+            color: var(--text-secondary);
+            font-weight: 500;
         }
 
         .add-span-btn {
-            background: var(--primary);
-            color: #000;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
+            background: transparent;
+            color: var(--primary);
+            border: 1px dashed var(--primary);
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.68rem;
             cursor: pointer;
+            font-weight: 500;
+            font-family: var(--font-main);
+            transition: all 0.15s;
+        }
+
+        .add-span-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-style: solid;
         }
 
         .span-row {
             display: flex;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 4px;
+            margin-bottom: 4px;
             align-items: center;
         }
 
         .span-row input {
             flex: 1;
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--input-bg);
             border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 6px 8px;
-            color: #fff;
-            font-size: 0.85rem;
+            border-radius: 3px;
+            padding: 5px 6px;
+            color: var(--text-primary);
+            font-size: 0.8rem;
+            font-family: var(--font-mono);
+        }
+
+        .span-row input:focus {
+            outline: none;
+            border-color: var(--primary);
         }
 
         .span-row .remove-btn {
-            background: rgba(255, 100, 100, 0.3);
-            color: #ff6b6b;
-            border: none;
-            width: 24px;
-            height: 24px;
-            border-radius: 4px;
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            width: 22px;
+            height: 22px;
+            border-radius: 3px;
             cursor: pointer;
-            font-size: 12px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.15s;
+            flex-shrink: 0;
+        }
+
+        .span-row .remove-btn:hover {
+            background: var(--danger);
+            color: #fff;
         }
 
         /* ========== CANVAS AREA ========== */
         .canvas-container {
             display: flex;
             flex-direction: column;
-            background: var(--darker);
+            background: var(--toolbar-bg);
         }
 
         .canvas-toolbar {
             display: flex;
-            gap: 8px;
-            padding: 8px 12px;
-            background: rgba(0, 0, 0, 0.3);
+            gap: 4px;
+            padding: 4px 8px;
+            background: var(--toolbar-bg);
             border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
+            align-items: center;
         }
 
+        /* ========== TOOL BUTTONS (Universal) ========== */
         .tool-btn {
-            padding: 6px 12px;
+            padding: 4px 10px;
             background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            color: #8b949e;
-            font-size: 0.75rem;
+            border: 1px solid transparent;
+            border-radius: 3px;
+            color: var(--text-secondary);
+            font-size: 0.72rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.12s;
+            font-family: var(--font-main);
+            font-weight: 500;
+            white-space: nowrap;
         }
 
         .tool-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-color: var(--primary);
-        }
-
-        .tool-btn.active {
-            background: rgba(255, 255, 255, 0.15);
-            color: var(--primary);
-            border-color: var(--primary);
-        }
-
-        /* v3.0 FIX: Light theme button visibility */
-        [data-theme="light"] .tool-btn {
-            color: #1e293b;
-            border-color: #94a3b8;
-            font-weight: 500;
-        }
-
-        [data-theme="light"] .tool-btn:hover {
-            background: #2563eb;
-            color: #fff;
-            border-color: #2563eb;
-        }
-
-        /* v3.0 FIX: Comprehensive Light theme text contrast */
-        [data-theme="light"] h3,
-        [data-theme="light"] h4,
-        [data-theme="light"] .sidebar-header,
-        [data-theme="light"] .section-title {
-            color: #0f172a !important;
-        }
-
-        [data-theme="light"] label,
-        [data-theme="light"] .label-text,
-        [data-theme="light"] .input-label {
-            color: #334155 !important;
-        }
-
-        [data-theme="light"] .stat-value,
-        [data-theme="light"] .metric-value,
-        [data-theme="light"] .result-value,
-        [data-theme="light"] .total-value {
-            color: #0f172a !important;
-            text-shadow: none !important;
-        }
-
-        [data-theme="light"] .stat-label,
-        [data-theme="light"] .metric-label,
-        [data-theme="light"] .result-label {
-            color: #475569 !important;
-        }
-
-        [data-theme="light"] input,
-        [data-theme="light"] select,
-        [data-theme="light"] textarea {
-            background: #ffffff !important;
-            color: #0f172a !important;
-            border-color: #cbd5e1 !important;
-        }
-
-        [data-theme="light"] input:focus,
-        [data-theme="light"] select:focus {
-            border-color: #2563eb !important;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1) !important;
-        }
-
-        [data-theme="light"] .card,
-        [data-theme="light"] .result-card,
-        [data-theme="light"] .metric-card {
-            background: #ffffff !important;
-            border: 1px solid #e2e8f0 !important;
-        }
-
-        [data-theme="light"] table th {
-            background: #f1f5f9 !important;
-            color: #0f172a !important;
-        }
-
-        [data-theme="light"] table td {
-            color: #1e293b !important;
-            border-color: #e2e8f0 !important;
-        }
-
-        [data-theme="light"] .grand-total,
-        [data-theme="light"] .summary-total {
-            background: #f0fdf4 !important;
-            color: #166534 !important;
-            border: 1px solid #86efac !important;
+            background: var(--surface-hover);
+            color: var(--text-primary);
+            border-color: var(--border);
         }
 
         .tool-btn.active {
             background: var(--primary);
-            color: #000;
+            color: var(--tab-active-text);
             border-color: var(--primary);
         }
 
@@ -919,161 +597,186 @@
         .summary-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 16px;
+            gap: 6px;
+            margin-bottom: 12px;
         }
 
         .summary-card {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 12px;
-            border-radius: 8px;
+            background: var(--surface);
+            padding: 8px;
+            border-radius: 4px;
             text-align: center;
+            border: 1px solid var(--border);
         }
 
         .summary-card .label {
-            font-size: 0.65rem;
-            color: #8b949e;
-            margin-bottom: 4px;
+            font-size: 0.6rem;
+            color: var(--text-muted);
+            margin-bottom: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 500;
         }
 
         .summary-card .value {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
             color: var(--primary);
+            font-family: var(--font-mono);
         }
 
         .summary-card .unit {
-            font-size: 0.65rem;
-            color: #8b949e;
+            font-size: 0.6rem;
+            color: var(--text-muted);
         }
 
         /* ========== RESULTS TABLE ========== */
         .results-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
         }
 
         .results-table th {
-            background: rgba(0, 0, 0, 0.3);
-            padding: 8px;
+            background: var(--surface);
+            padding: 6px 8px;
             text-align: left;
             color: var(--primary);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            font-weight: 600;
         }
 
         .results-table td {
-            padding: 10px 8px;
+            padding: 6px 8px;
             border-bottom: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
         }
 
-        /* Global select styling for visibility */
+        /* Global select styling */
         select {
-            background: var(--surface) !important;
-            color: #fff !important;
+            background: var(--input-bg) !important;
+            color: var(--text-primary) !important;
             border: 1px solid var(--border);
-            border-radius: 4px;
-            padding: 6px 8px;
+            border-radius: 3px;
+            padding: 5px 6px;
+            font-family: var(--font-main);
+            font-size: 0.78rem;
         }
 
         select option {
             background: var(--surface);
-            color: #fff;
+            color: var(--text-primary);
         }
 
         .results-table tr:hover {
-            background: rgba(0, 212, 255, 0.05);
+            background: var(--surface-hover);
         }
 
         /* ========== BUTTONS ========== */
         .action-btn {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 8px 12px;
+            background: var(--primary);
             border: none;
-            border-radius: 8px;
+            border-radius: 4px;
             color: #fff;
             font-weight: 600;
             cursor: pointer;
-            margin-top: 12px;
-            transition: all 0.2s;
+            margin-top: 8px;
+            transition: all 0.15s;
+            font-family: var(--font-main);
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.3);
+            background: var(--primary-dim);
+            box-shadow: var(--shadow-md);
         }
 
         /* ========== LOAD PATH INDICATOR ========== */
         .load-path {
-            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(0, 212, 255, 0.1));
-            border: 1px solid var(--success);
-            border-radius: 8px;
-            padding: 12px;
-            margin-bottom: 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--success);
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 12px;
             text-align: center;
         }
 
         .load-path h4 {
             color: var(--success);
-            font-size: 0.75rem;
-            margin-bottom: 6px;
+            font-size: 0.68rem;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         .load-path .path {
-            font-size: 0.9rem;
+            font-size: 0.78rem;
             font-weight: 600;
         }
 
         .load-path .arrow {
             color: var(--primary);
-            margin: 0 8px;
+            margin: 0 6px;
         }
 
         /* ========== FLOOR TABS ========== */
         .floor-tabs-container {
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
 
         .floor-tabs-header {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 8px;
+            gap: 6px;
+            margin-bottom: 6px;
         }
 
         .floor-tabs-header h4 {
-            font-size: 0.75rem;
+            font-size: 0.68rem;
             color: var(--primary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .floor-tabs {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 3px;
         }
 
         .floor-tab {
-            padding: 6px 12px;
-            background: var(--glass);
+            padding: 4px 10px;
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #8b949e;
-            font-size: 0.7rem;
+            border-radius: 3px;
+            color: var(--text-secondary);
+            font-size: 0.68rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.12s;
+            font-family: var(--font-main);
         }
 
         .floor-tab:hover {
-            background: rgba(0, 212, 255, 0.1);
+            background: var(--surface-hover);
             border-color: var(--primary);
+            color: var(--text-primary);
         }
 
         .floor-tab.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-color: transparent;
-            color: white;
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
         }
 
         .floor-tab.roof {
@@ -1082,103 +785,117 @@
         }
 
         .floor-tab.roof.active {
-            background: linear-gradient(135deg, var(--warning), #d97706);
-            color: white;
+            background: var(--warning);
+            border-color: var(--warning);
+            color: #fff;
         }
 
         .add-floor-btn {
-            padding: 6px 10px;
+            padding: 4px 8px;
             background: transparent;
             border: 1px dashed var(--success);
-            border-radius: 6px;
+            border-radius: 3px;
             color: var(--success);
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
+            font-family: var(--font-main);
+            font-weight: 500;
         }
 
         .add-floor-btn:hover {
-            background: rgba(16, 185, 129, 0.1);
+            background: var(--success);
+            color: #fff;
+            border-style: solid;
         }
 
         .remove-floor-btn {
-            padding: 6px 10px;
+            padding: 4px 8px;
             background: transparent;
             border: 1px dashed var(--danger);
-            border-radius: 6px;
+            border-radius: 3px;
             color: var(--danger);
-            font-size: 0.7rem;
+            font-size: 0.68rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.15s;
+            font-family: var(--font-main);
+            font-weight: 500;
         }
 
         .remove-floor-btn:hover {
-            background: rgba(239, 68, 68, 0.1);
+            background: var(--danger);
+            color: #fff;
+            border-style: solid;
         }
 
         .floor-info {
-            background: rgba(0, 212, 255, 0.05);
+            background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px;
-            margin-top: 8px;
+            border-radius: 4px;
+            padding: 8px;
+            margin-top: 6px;
         }
 
         .floor-info-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .floor-info-header h5 {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             color: var(--primary);
+            font-weight: 600;
         }
 
         .floor-type-badge {
-            font-size: 0.6rem;
-            padding: 2px 6px;
-            border-radius: 4px;
-            background: var(--secondary);
-            color: white;
+            font-size: 0.58rem;
+            padding: 1px 6px;
+            border-radius: 3px;
+            background: var(--primary);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .floor-type-badge.roof {
             background: var(--warning);
         }
 
-        /* ========== v2.4: VIEW TOGGLE ========== */
+        /* ========== VIEW TOGGLE ========== */
         .view-toggle {
             display: flex;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px;
-            border-radius: 8px;
-            margin-right: 8px;
+            gap: 2px;
+            background: var(--surface);
+            padding: 2px;
+            border-radius: 4px;
+            margin-right: 6px;
+            border: 1px solid var(--border);
         }
 
         .view-btn {
-            padding: 6px 12px;
+            padding: 4px 10px;
             background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: #8b949e;
-            font-size: 0.7rem;
+            border: none;
+            border-radius: 3px;
+            color: var(--text-secondary);
+            font-size: 0.68rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.12s;
+            font-family: var(--font-main);
         }
 
         .view-btn:hover {
-            background: rgba(0, 212, 255, 0.1);
-            border-color: var(--primary);
+            background: var(--surface-hover);
+            color: var(--text-primary);
         }
 
         .view-btn.active {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            border-color: transparent;
-            color: white;
+            background: var(--primary);
+            color: #fff;
         }
 
         #container3D {
@@ -1198,62 +915,68 @@
             position: relative;
         }
 
-        /* ========== v3.0: CANTILEVER INPUTS ========== */
+        /* ========== CANTILEVER INPUTS ========== */
         .cantilever-section {
             display: grid;
-            gap: 8px;
+            gap: 4px;
         }
 
         .cantilever-edge {
-            background: rgba(245, 158, 11, 0.08);
-            border: 1px solid rgba(245, 158, 11, 0.3);
-            border-radius: 6px;
-            padding: 8px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-left: 3px solid var(--warning);
+            border-radius: 3px;
+            padding: 6px 8px;
         }
 
         .cantilever-edge-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .cantilever-edge-header label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             color: var(--warning);
             font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .cantilever-spans {
             display: flex;
             flex-wrap: wrap;
-            gap: 4px;
+            gap: 3px;
         }
 
         .cantilever-span-input {
             display: flex;
             align-items: center;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.3);
-            padding: 4px 6px;
-            border-radius: 4px;
+            gap: 3px;
+            background: var(--group-bg);
+            padding: 3px 5px;
+            border-radius: 3px;
+            border: 1px solid var(--border);
         }
 
         .cantilever-span-input span {
-            font-size: 0.6rem;
-            color: #8b949e;
-            min-width: 20px;
+            font-size: 0.58rem;
+            color: var(--text-muted);
+            min-width: 16px;
+            font-family: var(--font-mono);
         }
 
         .cantilever-span-input input {
-            width: 50px;
-            background: rgba(255, 255, 255, 0.05);
+            width: 44px;
+            background: var(--input-bg);
             border: 1px solid var(--border);
-            border-radius: 3px;
-            padding: 4px;
-            color: #fff;
-            font-size: 0.75rem;
+            border-radius: 2px;
+            padding: 3px;
+            color: var(--text-primary);
+            font-size: 0.72rem;
             text-align: center;
+            font-family: var(--font-mono);
         }
 
         .cantilever-span-input input:focus {
@@ -1261,163 +984,230 @@
             border-color: var(--warning);
         }
 
-        /* ========== AUTOCAD-STYLE FOLDER TABS ========== */
+        /* ========== PLAN TABS (AutoCAD-style) ========== */
         .plan-tabs {
             display: flex;
             gap: 0;
-            background: #1a1a1f;
+            background: var(--toolbar-bg);
             padding: 0;
-            border-bottom: 2px solid #333;
+            border-bottom: 1px solid var(--border);
             margin-left: 0;
             align-items: flex-end;
-            height: 28px;
+            height: 26px;
+            overflow-x: auto;
+            overflow-y: hidden;
+            flex-shrink: 0;
+            scrollbar-width: none;
+        }
+
+        .plan-tabs::-webkit-scrollbar {
+            height: 0;
+        }
+
+        .plan-tab-separator {
+            width: 1px;
+            height: 16px;
+            background: var(--border);
+            margin: 0 2px;
+            align-self: center;
+            flex-shrink: 0;
+        }
+
+        .plan-tab-group-label {
+            font-size: 0.55rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            padding: 0 6px;
+            align-self: center;
+            white-space: nowrap;
+            font-weight: 600;
+            flex-shrink: 0;
         }
 
         .plan-tab {
-            padding: 6px 16px 5px 16px;
-            background: #252530;
+            padding: 5px 12px 4px 12px;
+            background: transparent;
             border: none;
-            border-top: 1px solid #444;
-            border-left: 1px solid #444;
-            border-right: 1px solid #333;
-            color: var(--text-muted, #8b949e);
-            font-size: 0.7rem;
+            border-top: 2px solid transparent;
+            color: var(--text-muted);
+            font-size: 0.68rem;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.1s;
             position: relative;
-            /* AutoCAD folder-tab angled edges */
-            clip-path: polygon(8px 0%, 100% 0%, 100% 100%, 0% 100%, 0% 8px);
-            margin-right: -1px;
+            margin-right: 0;
             border-radius: 0;
+            white-space: nowrap;
+            flex-shrink: 0;
+            font-family: var(--font-main);
+            clip-path: none;
         }
 
         .plan-tab:first-child {
-            margin-left: 4px;
+            margin-left: 0;
         }
 
         .plan-tab:hover {
-            background: #2a2a38;
+            background: var(--surface-hover);
             color: var(--text-primary);
         }
 
         .plan-tab.active {
-            background: #3a3a48;
-            color: #fff;
+            background: var(--surface-hover);
+            color: var(--primary);
             font-weight: 600;
-            border-top: 2px solid #4a9eff;
-            border-bottom: 2px solid transparent;
-            margin-bottom: -2px;
+            border-top: 2px solid var(--primary);
             z-index: 1;
         }
 
         /* Layer Toggle Buttons */
         .layer-toggles {
             display: flex;
-            gap: 4px;
+            gap: 3px;
             margin-left: auto;
-            padding-left: 12px;
+            padding-left: 8px;
             border-left: 1px solid var(--border);
         }
 
         .layer-btn {
-            padding: 4px 8px;
+            padding: 3px 7px;
             background: transparent;
-            border: 1px solid var(--border);
-            border-radius: 4px;
+            border: 1px solid transparent;
+            border-radius: 3px;
             color: var(--text-muted);
-            font-size: 0.65rem;
+            font-size: 0.62rem;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: all 0.12s;
+            font-family: var(--font-main);
+            font-weight: 500;
         }
 
         .layer-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: var(--primary);
-            color: var(--primary);
+            background: var(--surface-hover);
+            color: var(--text-primary);
         }
 
         .layer-btn.active {
             background: var(--primary);
-            color: #000;
+            color: #fff;
             border-color: var(--primary);
         }
 
-
-        /* FIX: Ensure Header doesn't clip dropdown */
-        .header {
-            overflow: visible !important;
-            z-index: 9000 !important;
-        }
-
-        /* FIX: Dropdown on top of everything */
-        .settings-dropdown {
-            z-index: 10000 !important;
-        }
-
-        /* ========== v3.8: SCHEDULE PANELS ========== */
+        /* ========== SCHEDULE PANELS ========== */
         .schedule-panel {
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: #ffffff;
-            padding: 20px;
+            background: #fafbfc;
+            padding: 16px 20px;
             overflow: auto;
-            font-family: Arial, sans-serif;
+            font-family: var(--font-main);
             z-index: 100;
-            /* Above canvas */
         }
 
         .schedule-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
+            margin-bottom: 12px;
+            padding-bottom: 10px;
             border-bottom: 2px solid #1e3a5f;
         }
 
         .schedule-header h3 {
             margin: 0;
             color: #1e3a5f;
-            font-size: 1.2rem;
+            font-size: 1rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
         }
 
         .schedule-summary {
-            color: #666;
-            font-size: 0.9rem;
+            color: #6b7280;
+            font-size: 0.78rem;
+            font-family: var(--font-mono);
         }
 
         .schedule-table-wrapper {
             overflow-x: auto;
-            max-height: calc(100% - 120px);
-            border: 1px solid #ccc;
+            max-height: calc(100% - 100px);
+            border: 1px solid #d1d5db;
             border-radius: 4px;
+        }
+
+        /* ========== STATUS BAR ========== */
+        .status-bar {
+            height: 24px;
+            background: var(--status-bg);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 12px;
+            gap: 16px;
+            font-size: 0.62rem;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            flex-shrink: 0;
+        }
+
+        .status-bar .status-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .status-bar .status-separator {
+            width: 1px;
+            height: 12px;
+            background: var(--border);
+        }
+
+        .status-bar .status-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--success);
+        }
+
+        .status-bar .status-label {
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .status-bar .status-value {
+            color: var(--text-secondary);
         }
 
         .schedule-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.78rem;
+            font-family: var(--font-main);
         }
 
         .schedule-table th {
             background: #1e3a5f;
             color: white;
-            padding: 10px 8px;
+            padding: 8px 6px;
             text-align: center;
             font-weight: 600;
-            border: 1px solid #333;
+            border: 1px solid #15294a;
             position: sticky;
             top: 0;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
         }
 
         .schedule-table td {
-            padding: 8px;
+            padding: 6px;
             text-align: center;
-            border: 1px solid #ccc;
+            border: 1px solid #e5e7eb;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
         }
 
         .schedule-table tbody tr:nth-child(even) {
@@ -1425,7 +1215,7 @@
         }
 
         .schedule-table tbody tr:hover {
-            background: #e8f4fc;
+            background: #e8f0fe;
         }
 
         .schedule-table input {
@@ -1433,32 +1223,35 @@
             border: none;
             background: transparent;
             text-align: center;
-            font-family: Arial;
-            font-size: 0.85rem;
+            font-family: var(--font-mono);
+            font-size: 0.78rem;
         }
 
         .schedule-table input:focus {
             background: #fff3cd;
-            outline: 2px solid #ffc107;
+            outline: 2px solid #f0a030;
         }
 
         .schedule-actions {
-            margin-top: 16px;
+            margin-top: 12px;
             display: flex;
-            gap: 12px;
+            gap: 8px;
             justify-content: flex-end;
         }
 
         /* Oblong action buttons */
         .action-btn.oblong {
-            padding: 10px 24px;
-            border-radius: 20px;
-            border: 2px solid #1e3a5f;
+            padding: 7px 18px;
+            border-radius: 4px;
+            border: 1px solid #1e3a5f;
             background: #ffffff;
             color: #1e3a5f;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.15s;
+            font-family: var(--font-main);
+            font-size: 0.75rem;
+            width: auto;
         }
 
         .action-btn.oblong:hover {
@@ -1470,7 +1263,32 @@
         .schedule-table td.row-num {
             background: #f1f5f9;
             font-weight: 600;
-            color: #666;
+            color: #6b7280;
+        }
+
+        /* ========== COMPACT RESULTS TABLE ========== */
+        .compact-table {
+            font-family: var(--font-mono) !important;
+        }
+
+        .compact-table td, .compact-table th {
+            font-family: var(--font-mono) !important;
+        }
+
+        /* ========== TOOLBAR SEPARATOR ========== */
+        .toolbar-separator {
+            width: 1px;
+            height: 18px;
+            background: var(--border);
+            margin: 0 4px;
+            flex-shrink: 0;
+        }
+
+        /* ========== RESPONSIVE ADJUSTMENTS ========== */
+        @media (max-width: 1200px) {
+            .app-container {
+                grid-template-columns: 260px 1fr 260px;
+            }
         }
     </style>
 
@@ -1482,28 +1300,39 @@
 <body>
     <!-- ========== HEADER ========== -->
     <header class="header">
-        <!-- Hamburger Menu (Settings) + Title - TOGETHER on LEFT -->
-        <div style="display: flex; align-items: center; gap: 8px; position: relative;">
-            <button class="tool-btn settings-gear" onclick="toggleDropdown()" title="Menu">
+        <!-- Logo + Menu -->
+        <div style="display: flex; align-items: center; gap: 8px; position: relative; flex-shrink: 0;">
+            <button class="tool-btn settings-gear" onclick="toggleDropdown()" title="Menu" style="padding: 4px 6px;">
                 ☰
             </button>
-            <!-- Dropdown Menu (Paper Matte only - no theme switching) -->
             <div id="settingsDropdown" class="settings-dropdown hidden">
+                <div class="menu-item-header">File</div>
                 <button class="menu-item" onclick="resetProject(); toggleDropdown()">New Project</button>
-                <button class="menu-item" onclick="saveProject(); toggleDropdown()">Save JSON</button>
+                <button class="menu-item" onclick="saveProject(); toggleDropdown()">Save Project (.json)</button>
+                <button class="menu-item" onclick="document.getElementById('loadProjectInput').click(); toggleDropdown()">Open Project (.json)</button>
+                <div class="menu-item-header">Export</div>
+                <button class="menu-item" onclick="exportResults(); toggleDropdown()">PDF Report</button>
+                <button class="menu-item" onclick="exportToDXF(); toggleDropdown()">AutoCAD DXF</button>
+                <button class="menu-item" onclick="exportToIFC(); toggleDropdown()">IFC (BIM)</button>
+                <button class="menu-item" onclick="exportToSTAAD(); toggleDropdown()">STAAD.Pro</button>
+                <button class="menu-item" onclick="exportToETABS(); toggleDropdown()">ETABS/SAP</button>
+                <div class="menu-item-header">Theme</div>
+                <button class="menu-item" onclick="setTheme('dark'); toggleDropdown()">Dark</button>
+                <button class="menu-item" onclick="setTheme('light'); toggleDropdown()">Light</button>
+                <button class="menu-item" onclick="setTheme('blueprint'); toggleDropdown()">Blueprint</button>
             </div>
-
-            <span
-                style="font-weight: 600; font-size: 1rem; color: var(--text-primary); text-transform: uppercase;">FutolStructure</span>
+            <span style="font-weight: 700; font-size: 0.88rem; color: var(--text-primary); letter-spacing: -0.01em;">FutolStructure</span>
+            <span style="font-size: 0.58rem; color: var(--text-muted); font-weight: 500; padding: 1px 5px; background: var(--surface); border: 1px solid var(--border); border-radius: 3px;">v3.16</span>
         </div>
+        <!-- Action Toolbar -->
         <div class="header-actions">
-            <button class="tool-btn" onclick="calculate()">Run</button>
-            <button class="tool-btn" onclick="exportResults()">Report</button>
-            <!-- Export buttons -->
-            <button class="tool-btn" onclick="exportToSTAAD()">STAAD</button>
-            <button class="tool-btn" onclick="exportToETABS()">ETABS</button>
-            <button class="tool-btn" onclick="exportToDXF()" title="Export 2D plan to AutoCAD DXF">DXF</button>
-            <button class="tool-btn" onclick="exportToIFC()" title="Export to IFC (Revit/ArchiCAD/Tekla)">IFC</button>
+            <button class="tool-btn" onclick="calculate()" style="background: var(--primary); color: #fff; font-weight: 600;">Run Analysis</button>
+            <span class="toolbar-separator"></span>
+            <button class="tool-btn" onclick="exportResults()" title="Generate PDF Report">Report</button>
+            <button class="tool-btn" onclick="exportToDXF()" title="Export to AutoCAD DXF">DXF</button>
+            <button class="tool-btn" onclick="exportToIFC()" title="Export to IFC (BIM)">IFC</button>
+            <button class="tool-btn" onclick="exportToSTAAD()" title="Export to STAAD.Pro">STAAD</button>
+            <button class="tool-btn" onclick="exportToETABS()" title="Export to ETABS">ETABS</button>
         </div>
     </header>
 
@@ -1661,8 +1490,8 @@
                             title="0 = Auto (use L/16 rule)">
                     </div>
                 </div>
-                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 4px;">
-                    💡 Set to 0 for auto-sizing (NSCP rules). Column h=0 means square.
+                <div style="font-size: 0.62rem; color: var(--text-muted); margin-top: 4px; font-style: italic;">
+                    Set to 0 for auto-sizing per NSCP rules. Column h=0 means square.
                 </div>
             </div>
 
@@ -1749,87 +1578,79 @@
         <!-- ========== CENTER: CANVAS ========== -->
         <div class="canvas-container">
             <div class="canvas-toolbar">
-                <!-- 3D View Toggle -->
-                <button class="view-btn" id="view3D" onclick="setView('3d')">3D View</button>
+                <!-- 3D/2D Toggle -->
+                <button class="view-btn" id="view3D" onclick="setView('3d')">3D</button>
 
-                <!-- v3.0: 2D Plan Tabs -->
+                <!-- Plan Tabs with Category Grouping -->
                 <div class="plan-tabs" id="planTabs">
-                    <button class="plan-tab active" id="tabStructural" onclick="setPlanTab('structural')">Structural
-                        Layout</button>
-                    <button class="plan-tab" id="tabAnalysis" onclick="setPlanTab('analysis')">
-                        Tributary Areas</button>
-                    <button class="plan-tab" id="tabFoundation" onclick="setPlanTab('foundation')">Foundation
-                        Plan</button>
-                    <!-- v3.8: Schedule Tabs (replacing modal) -->
-                    <button class="plan-tab" id="tabColSchedule" onclick="setPlanTab('colSchedule')">Column
-                        Schedule</button>
-                    <button class="plan-tab" id="tabBeamSchedule" onclick="setPlanTab('beamSchedule')">Beam
-                        Schedule</button>
-                    <button class="plan-tab" id="tabFootingSchedule" onclick="setPlanTab('footingSchedule')">Footing
-                        Schedule</button>
-                    <button class="plan-tab" id="tabSlabSchedule" onclick="setPlanTab('slabSchedule')">Slab
-                        Schedule</button>
+                    <!-- PLANS -->
+                    <span class="plan-tab-group-label">Plans</span>
+                    <button class="plan-tab active" id="tabStructural" onclick="setPlanTab('structural')">Layout</button>
+                    <button class="plan-tab" id="tabAnalysis" onclick="setPlanTab('analysis')">Tributary</button>
+                    <button class="plan-tab" id="tabFoundation" onclick="setPlanTab('foundation')">Foundation</button>
+
+                    <span class="plan-tab-separator"></span>
+                    <span class="plan-tab-group-label">Schedules</span>
+                    <button class="plan-tab" id="tabColSchedule" onclick="setPlanTab('colSchedule')">Columns</button>
+                    <button class="plan-tab" id="tabBeamSchedule" onclick="setPlanTab('beamSchedule')">Beams</button>
+                    <button class="plan-tab" id="tabFootingSchedule" onclick="setPlanTab('footingSchedule')">Footings</button>
+                    <button class="plan-tab" id="tabSlabSchedule" onclick="setPlanTab('slabSchedule')">Slabs</button>
+                    <button class="plan-tab" id="tabRebarSchedule" onclick="setPlanTab('rebarSchedule')">Rebar</button>
+                    <button class="plan-tab" id="tabBBS" onclick="setPlanTab('bbs')">BBS</button>
+
+                    <span class="plan-tab-separator"></span>
+                    <span class="plan-tab-group-label">Design</span>
+                    <button class="plan-tab" id="tabBeamDesign" onclick="setPlanTab('beamDesign')">Beam</button>
+                    <button class="plan-tab" id="tabColDesign" onclick="setPlanTab('colDesign')">Column</button>
+                    <button class="plan-tab" id="tabSlabDesign" onclick="setPlanTab('slabDesign')">Slab</button>
                     <button class="plan-tab" id="tabBlockwall" onclick="setPlanTab('blockwall')">Blockwall</button>
-                    <button class="plan-tab" id="tabLoadSummary" onclick="setPlanTab('loadSummary')">Load
-                        Summary</button>
-                    <button class="plan-tab" id="tabRebarSchedule" onclick="setPlanTab('rebarSchedule')">Rebar
-                        Schedule</button>
-                    <button class="plan-tab" id="tabBOM" onclick="setPlanTab('bom')">Bill of Materials</button>
+                    <button class="plan-tab" id="tabStaircase" onclick="setPlanTab('staircase')">Staircase</button>
+                    <button class="plan-tab" id="tabWaterTank" onclick="setPlanTab('waterTank')">Tank</button>
+                    <button class="plan-tab" id="tabRetainingWall" onclick="setPlanTab('retainingWall')">Ret. Wall</button>
+                    <button class="plan-tab" id="tabCombinedFtg" onclick="setPlanTab('combinedFtg')">Comb. Ftg</button>
+
+                    <span class="plan-tab-separator"></span>
+                    <span class="plan-tab-group-label">Checks</span>
+                    <button class="plan-tab" id="tabCrackWidth" onclick="setPlanTab('crackWidth')">Crack</button>
+                    <button class="plan-tab" id="tabSlenderness" onclick="setPlanTab('slenderness')">Slender</button>
+                    <button class="plan-tab" id="tabDuctile" onclick="setPlanTab('ductile')">Ductile</button>
+                    <button class="plan-tab" id="tabDeflection" onclick="setPlanTab('deflection')">Deflect</button>
+                    <button class="plan-tab" id="tabDevLength" onclick="setPlanTab('devLength')">Dev Len</button>
+                    <button class="plan-tab" id="tabTorsion" onclick="setPlanTab('torsion')">Torsion</button>
+                    <button class="plan-tab" id="tabFdnStability" onclick="setPlanTab('fdnStability')">Fdn Stab</button>
+
+                    <span class="plan-tab-separator"></span>
+                    <span class="plan-tab-group-label">Loads</span>
+                    <button class="plan-tab" id="tabLoadSummary" onclick="setPlanTab('loadSummary')">Summary</button>
+                    <button class="plan-tab" id="tabLoadCombos" onclick="setPlanTab('loadCombos')">Combos</button>
                     <button class="plan-tab" id="tabSeismic" onclick="setPlanTab('seismic')">Seismic</button>
                     <button class="plan-tab" id="tabWind" onclick="setPlanTab('wind')">Wind</button>
-                    <button class="plan-tab" id="tabBeamDesign" onclick="setPlanTab('beamDesign')">Beam Design</button>
-                    <button class="plan-tab" id="tabColDesign" onclick="setPlanTab('colDesign')">Column Check</button>
-                    <button class="plan-tab" id="tabSlabDesign" onclick="setPlanTab('slabDesign')">Slab Design</button>
-                    <button class="plan-tab" id="tabStaircase" onclick="setPlanTab('staircase')">Staircase</button>
-                    <button class="plan-tab" id="tabWaterTank" onclick="setPlanTab('waterTank')">Water Tank</button>
-                    <button class="plan-tab" id="tabBBS" onclick="setPlanTab('bbs')">Bar Bending</button>
-                    <button class="plan-tab" id="tabCrackWidth" onclick="setPlanTab('crackWidth')">Crack Width</button>
-                    <button class="plan-tab" id="tabSlenderness"
-                        onclick="setPlanTab('slenderness')">Slenderness</button>
-                    <button class="plan-tab" id="tabDuctile" onclick="setPlanTab('ductile')">Ductile Detail</button>
-                    <button class="plan-tab" id="tabDeflection" onclick="setPlanTab('deflection')">Deflection</button>
-                    <button class="plan-tab" id="tabLoadCombos" onclick="setPlanTab('loadCombos')">Load Combos</button>
-                    <button class="plan-tab" id="tabDevLength" onclick="setPlanTab('devLength')">Dev. Length</button>
-                    <button class="plan-tab" id="tabFdnStability" onclick="setPlanTab('fdnStability')">Fdn
-                        Stability</button>
-                    <button class="plan-tab" id="tabPDFReport" onclick="setPlanTab('pdfReport')">PDF Report</button>
+
+                    <span class="plan-tab-separator"></span>
+                    <span class="plan-tab-group-label">Output</span>
+                    <button class="plan-tab" id="tabBOM" onclick="setPlanTab('bom')">BOM</button>
+                    <button class="plan-tab" id="tabSteelSummary" onclick="setPlanTab('steelSummary')">Steel</button>
+                    <button class="plan-tab" id="tabCostEstimate" onclick="setPlanTab('costEstimate')">Cost</button>
+                    <button class="plan-tab" id="tabMixDesign" onclick="setPlanTab('mixDesign')">Mix</button>
+                    <button class="plan-tab" id="tabPDFReport" onclick="setPlanTab('pdfReport')">PDF</button>
                     <button class="plan-tab" id="tabDashboard" onclick="setPlanTab('dashboard')">Dashboard</button>
                     <button class="plan-tab" id="tabSettings" onclick="setPlanTab('settings')">Settings</button>
-                    <button class="plan-tab" id="tabCostEstimate" onclick="setPlanTab('costEstimate')">Cost
-                        Estimate</button>
-                    <button class="plan-tab" id="tabSteelSummary" onclick="setPlanTab('steelSummary')">Steel
-                        Summary</button>
-                    <button class="plan-tab" id="tabRetainingWall" onclick="setPlanTab('retainingWall')">Retaining
-                        Wall</button>
-                    <button class="plan-tab" id="tabCombinedFtg" onclick="setPlanTab('combinedFtg')">Combined
-                        Ftg</button>
-                    <button class="plan-tab" id="tabTorsion" onclick="setPlanTab('torsion')">Torsion</button>
-                    <button class="plan-tab" id="tabMixDesign" onclick="setPlanTab('mixDesign')">Mix Design</button>
-                    <button class="plan-tab" id="tabAIAssistant" onclick="setPlanTab('aiAssistant')"
-                        style="background:#7c3aed; color:#fff;">AI Assistant</button>
+                    <button class="plan-tab" id="tabAIAssistant" onclick="setPlanTab('aiAssistant')">AI</button>
                 </div>
 
-                <!-- v3.8: Canvas Toolbar - Reorganized for logical hierarchy -->
-                <!-- 1. Navigation Tools -->
-                <button class="tool-btn" id="panTool" onclick="togglePan()">Pan</button>
-                <button class="tool-btn" onclick="zoomIn()" title="Zoom In">➕</button>
-                <button class="tool-btn" onclick="zoomOut()" title="Zoom Out">➖</button>
-                <button class="tool-btn" onclick="fitView()" title="Fit View">⛶</button>
-                <button class="tool-btn active" id="gridMeshBtn" onclick="toggleGridMesh()"
-                    title="Toggle 1m grid mesh background">📐 Grid</button>
-
-                <!-- Layer toggles moved to settings -->
-
-                <!-- 3. Action Buttons (Modeling Tools) -->
-                <button class="tool-btn" id="addBeamBtn" onclick="toggleBeamMode()"
-                    title="Click to add framing beam, then click-drag on canvas">Add Beam</button>
-                <button class="tool-btn" id="addCustomBeamBtn" onclick="showCustomBeamDialog()"
-                    title="Add framing beam via dialog (gridline-based)">Stair Beam</button>
-                <button class="tool-btn" id="addPlantedColBtn" onclick="togglePlantedColumnMode(event)"
-                    title="Click to select beam for planted column. Shift+Click for grid/custom placement.">
-                    Planted Col</button>
-                <button class="tool-btn" id="colAlignBtn" onclick="toggleColumnAlignment()"
-                    title="Toggle edge column alignment (Centered ↔ Flush to Grid)">Col: Center</button>
+                <!-- Canvas Tools -->
+                <span class="toolbar-separator"></span>
+                <button class="tool-btn" id="panTool" onclick="togglePan()" title="Pan (drag canvas)">Pan</button>
+                <button class="tool-btn" onclick="zoomIn()" title="Zoom In">+</button>
+                <button class="tool-btn" onclick="zoomOut()" title="Zoom Out">-</button>
+                <button class="tool-btn" onclick="fitView()" title="Fit to View">Fit</button>
+                <button class="tool-btn active" id="gridMeshBtn" onclick="toggleGridMesh()" title="Toggle grid">Grid</button>
+                <span class="toolbar-separator"></span>
+                <!-- Modeling Tools -->
+                <button class="tool-btn" id="addBeamBtn" onclick="toggleBeamMode()" title="Add framing beam">+ Beam</button>
+                <button class="tool-btn" id="addCustomBeamBtn" onclick="showCustomBeamDialog()" title="Add stair framing beam">Stair Beam</button>
+                <button class="tool-btn" id="addPlantedColBtn" onclick="togglePlantedColumnMode(event)" title="Add planted column">+ Column</button>
+                <button class="tool-btn" id="colAlignBtn" onclick="toggleColumnAlignment()" title="Toggle column alignment">Col: Center</button>
             </div>
             <div class="canvas-wrapper">
                 <canvas id="mainCanvas"></canvas>
@@ -1955,84 +1776,84 @@
 
         <!-- ========== RIGHT PANEL: RESULTS ========== -->
         <div class="panel">
-            <div class="panel-header">Results</div>
+            <div class="panel-header">Analysis Results</div>
 
-            <!-- Compact Results Table (Paper Matte style) -->
-            <div class="results-table-container" style="overflow-x:auto; margin-top:8px; border: 1px solid #000;">
+            <!-- Compact Results Table -->
+            <div class="results-table-container" style="overflow-x:auto; margin-top:4px; border: 1px solid var(--border); border-radius: 4px;">
                 <table class="compact-table"
-                    style="width:100%; border-collapse: collapse; font-family: monospace; font-size: 0.75rem; color: #000;">
-                    <tr style="border-bottom: 2px solid #000; background: #e8eef4;">
-                        <th style="text-align:left; padding:6px; font-weight:bold;">METRIC</th>
-                        <th style="text-align:right; padding:6px; font-weight:bold;">VALUE</th>
-                        <th style="text-align:left; padding:6px; font-weight:bold;">UNIT</th>
+                    style="width:100%; border-collapse: collapse; font-size: 0.72rem; color: var(--text-primary);">
+                    <tr style="border-bottom: 2px solid var(--border); background: var(--surface);">
+                        <th style="text-align:left; padding:5px 6px; font-weight:600; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-muted);">Metric</th>
+                        <th style="text-align:right; padding:5px 6px; font-weight:600; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-muted);">Value</th>
+                        <th style="text-align:left; padding:5px 6px; font-weight:600; font-size:0.65rem; text-transform:uppercase; letter-spacing:0.5px; color: var(--text-muted);">Unit</th>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">TOTAL SLAB AREA</td>
-                        <td style="text-align:right; padding:4px; font-weight:bold;" id="totalArea">0</td>
-                        <td style="padding:4px;">m²</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Total Slab Area</td>
+                        <td style="text-align:right; padding:4px 6px; font-weight:600;" id="totalArea">0</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">m&sup2;</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">AREA BALANCE</td>
-                        <td style="text-align:right; padding:4px;" id="areaBalance">0%</td>
-                        <td style="padding:4px; font-size:0.65rem;" id="areaBalanceDetail">beam vs slab</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Area Balance</td>
+                        <td style="text-align:right; padding:4px 6px;" id="areaBalance">0%</td>
+                        <td style="padding:4px 6px; font-size:0.6rem; color: var(--text-muted);" id="areaBalanceDetail">beam vs slab</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">FACTORED LOAD</td>
-                        <td style="text-align:right; padding:4px;" id="factoredLoad">0</td>
-                        <td style="padding:4px;">kPa</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Factored Load</td>
+                        <td style="text-align:right; padding:4px 6px;" id="factoredLoad">0</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kPa</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">TOTAL/FLOOR</td>
-                        <td style="text-align:right; padding:4px;" id="totalPerFloor">0</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Total / Floor</td>
+                        <td style="text-align:right; padding:4px 6px;" id="totalPerFloor">0</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
-                    <tr style="border-bottom: 2px solid #000;">
-                        <td style="padding:4px;">MAX COLUMN</td>
-                        <td style="text-align:right; padding:4px;" id="maxColumn">0</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Max Column Load</td>
+                        <td style="text-align:right; padding:4px 6px; font-weight:600; color: var(--primary);" id="maxColumn">0</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
 
                     <!-- Load Summary Header -->
-                    <tr style="background:#000; color:#fff;">
-                        <td colspan="3" style="padding:6px; font-weight:bold; letter-spacing:1px; text-align:center;">
-                            LOAD SUMMARY</td>
+                    <tr style="background: var(--primary); color:#fff;">
+                        <td colspan="3" style="padding:5px 6px; font-weight:600; letter-spacing:0.8px; text-align:center; font-size:0.65rem; text-transform:uppercase;">
+                            Load Summary (All Floors)</td>
                     </tr>
 
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">SLAB DL</td>
-                        <td style="text-align:right; padding:4px;" id="sumSlabDL">-</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Slab Dead Load</td>
+                        <td style="text-align:right; padding:4px 6px;" id="sumSlabDL">-</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">LIVE LOAD</td>
-                        <td style="text-align:right; padding:4px;" id="sumLL">-</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Live Load</td>
+                        <td style="text-align:right; padding:4px 6px;" id="sumLL">-</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">BEAM DL</td>
-                        <td style="text-align:right; padding:4px;" id="sumBeamDL">-</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Beam Dead Load</td>
+                        <td style="text-align:right; padding:4px 6px;" id="sumBeamDL">-</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">COLUMN DL</td>
-                        <td style="text-align:right; padding:4px;" id="sumColDL">-</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Column Dead Load</td>
+                        <td style="text-align:right; padding:4px 6px;" id="sumColDL">-</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
-                    <tr style="border-bottom: 1px solid #ccc;">
-                        <td style="padding:4px;">TIE BEAM</td>
-                        <td style="text-align:right; padding:4px;" id="sumTieBeamDL">-</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Tie Beam</td>
+                        <td style="text-align:right; padding:4px 6px;" id="sumTieBeamDL">-</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
-                    <tr style="border-bottom: 2px solid #000;">
-                        <td style="padding:4px;">FOOTINGS</td>
-                        <td style="text-align:right; padding:4px;" id="sumFootingDL">-</td>
-                        <td style="padding:4px;">kN</td>
+                    <tr style="border-bottom: 2px solid var(--border);">
+                        <td style="padding:4px 6px; font-size:0.7rem;">Footings</td>
+                        <td style="text-align:right; padding:4px 6px;" id="sumFootingDL">-</td>
+                        <td style="padding:4px 6px; color: var(--text-muted);">kN</td>
                     </tr>
                     <!-- Grand Total -->
-                    <tr style="background:#f8fafc; font-weight:bold;">
-                        <td style="padding:8px; border-right:1px solid #000;">GRAND TOTAL</td>
-                        <td style="text-align:right; padding:8px; font-size:1rem;" id="grandTotal">-</td>
-                        <td style="padding:8px;">kN</td>
+                    <tr style="background: var(--surface); font-weight:700;">
+                        <td style="padding:6px; font-size:0.75rem;">GRAND TOTAL</td>
+                        <td style="text-align:right; padding:6px; font-size:0.9rem; color: var(--primary);" id="grandTotal">-</td>
+                        <td style="padding:6px; color: var(--text-muted);">kN</td>
                     </tr>
                 </table>
             </div>
@@ -4891,10 +4712,10 @@
                 // v3.0: Size beams immediately to establish self-weight for this floor
                 sizeMembers();
 
-                //         Cal         am reactions
-                calcul         actions();
+                // Calculate beam reactions
+                calculateBeamReactions();
 
-                // Step 6: Add reactions         ns for this floor
+                // Step 6: Add reactions to columns for this floor
                 calculateColumnLoadsForFloor(floor.id);
 
                 // Restore global cantilevers
@@ -4931,6 +4752,43 @@
 
             // v3.0: Update concrete volume summary
             updateConcreteVolume();
+
+            // v3.16: Update professional status bar
+            updateStatusBar();
+        }
+
+        /**
+         * v3.16: Update professional status bar with current project info
+         */
+        function updateStatusBar() {
+            const indicator = document.getElementById('statusIndicator');
+            const statusText = document.getElementById('statusText');
+            const statusGrid = document.getElementById('statusGrid');
+            const statusFloors = document.getElementById('statusFloors');
+            const statusMembers = document.getElementById('statusMembers');
+
+            if (indicator) indicator.style.background = 'var(--success)';
+            if (statusText) statusText.textContent = 'Analysis Complete';
+
+            if (statusGrid) {
+                statusGrid.textContent = state.xSpans.length + 'x' + state.ySpans.length;
+            }
+
+            if (statusFloors) {
+                statusFloors.textContent = state.floors.length;
+            }
+
+            if (statusMembers) {
+                const nCols = state.columns ? state.columns.filter(c => c.active !== false).length : 0;
+                const nBeams = state.beams ? state.beams.length : 0;
+                const nSlabs = state.slabs ? state.slabs.length : 0;
+                statusMembers.textContent = nCols + 'C / ' + nBeams + 'B / ' + nSlabs + 'S';
+            }
+
+            // Auto-clear status after 5 seconds
+            setTimeout(() => {
+                if (statusText) statusText.textContent = 'Ready';
+            }, 5000);
         }
 
         /**
@@ -4977,12 +4835,12 @@
                 // Use suggestedB/H if available, else estimate 250×250
                 const colB = (col.suggestedB || 250) / 1000;  // m
                 const colH = (col.suggestedH || 250) / 1000;  // m
-                const colVolume = c        lH * ght;  // m³ per floor
-                  nst colDL = colVolume * state.concreteDensity * numFloors * 1.2;  // Factored
+                const colVolume = colB * colH * floorHeight;  // m³ per floor
+                const colDL = colVolume * state.concreteDensity * numFloors * 1.2;  // Factored
 
                 // Total load includes: slab+beam (from floors) + column DL + tie beam DL
-                  nst          ored = col.totalLoad + colDL + PerColumn;
-                col.totalLoadWithDL = tot         d;  // Store for display
+                const totalFactored = col.totalLoad + colDL + tieBeamDLPerColumn;
+                col.totalLoadWithDL = totalFactored;  // Store for display
 
                 // Use unfactored load for footing sizing (service load)
                 const P_service = totalFactored / 1.4; // kN
@@ -5443,10 +5301,12 @@
                         });
                     }
                 }
-            }              // TOP EDGE BEAM: Runs along the top edge of cantilever                   let topEdgeSegments = [];
-            for (let i < state.xSpans.length; xi++) {
-                ntLen = state.cantilevers.top[xi] || 0;
-                i         n > 0) {
+            }
+            // TOP EDGE BEAM: Runs along the top edge of cantilever
+            let topEdgeSegments = [];
+            for (let xi = 0; xi < state.xSpans.length; xi++) {
+                const cantLen = state.cantilevers.top[xi] || 0;
+                if (cantLen > 0) {
                     topEdgeSegments.push({ xi, cantLen });
                 }
             }
@@ -5944,8 +5804,9 @@
                     }
 
                     makeSlice(topBeamId, 'top', A_top, topPoly);
-                       eSli         BeamId, 'bottom', A_bottom, bottomP                          makeSlice(leftBeamId, 'left', A_         tPoly);
-                    makeSlice(rightBeamId, 'right', rightPoly);
+                    makeSlice(bottomBeamId, 'bottom', A_bottom, bottomPoly);
+                    makeSlice(leftBeamId, 'left', A_left, leftPoly);
+                    makeSlice(rightBeamId, 'right', A_right, rightPoly);
                 } else {
                     // One-way slab: split into 2 rectangles
                     const halfArea = slab.area / 2;
@@ -5961,9 +5822,10 @@
                         // Spanning in X, supported by top/bottom beams
                         const midY = (y0 + y1) / 2;
                         const topPoly = [{ x: x0, y: y0 }, { x: x1, y: y0 }, { x: x1, y: midY }, { x: x0, y: midY }];
-                        const bottomPoly = [{ x: x0, y: midY }, { x: x1, y: m         x:           }, { x: x0, y: y1 }];
+                        const bottomPoly = [{ x: x0, y: midY }, { x: x1, y: midY }, { x: x1, y: y1 }, { x: x0, y: y1 }];
                         makeSlice(topBeamId, 'top', halfArea, topPoly);
-                        makeSlice(bottomBeamId, 'bottom', halfArea, bott                             }
+                        makeSlice(bottomBeamId, 'bottom', halfArea, bottomPoly);
+                    }
                 }
             }
 
@@ -6046,8 +5908,9 @@
 
                 const mainBeam = beamMap[mainEdgeBeamId];
                 if (mainBeam) {
-                    // Add FULL cantilever area to the su         edg                           mainBeam.tributaryArea += slabArea;
-                     ainBeam.slices.push({
+                    // Add FULL cantilever area to the supporting edge beam
+                    mainBeam.tributaryArea += slabArea;
+                    mainBeam.slices.push({
                         slabId: slab.id,
                         side: 'cantilever',
                         area: slabArea,
@@ -6075,8 +5938,8 @@
                     cantBeam1Id = `${ prefix } -${ spanIndex + 1 } `;
                     cantBeam2Id = `${ prefix } -${ spanIndex + 2 } `;
                 }
-                 // Cantilever beams get half the         h (for their own load calc)
-                co         rea = slabArea / 2;
+                // Cantilever beams get half the slab area each (for their own load calc)
+                const halfArea = slabArea / 2;
                 const cantBeam1 = beamMap[cantBeam1Id];
                 const cantBeam2 = beamMap[cantBeam2Id];
 
@@ -6203,13 +6066,16 @@
          */
         function sizeColumn(Pu_kN, height_m = 3.0) {
             const phi = 0.65;  // NSCP reduction factor for tied columns
-            const rho = 0.01;  // 1% minimum steel ratio
+            const rho = 0.01;  // 1% minimum steel ratio (NSCP 410.6.1.1)
+            const rho_max = 0.08;  // 8% maximum steel ratio (NSCP 410.6.1.1)
             const fc = state.fc;  // MPa
             const fy = state.fy;  // MPa
             const Pu = Pu_kN * 1000;  // Convert kN to N
 
             let b, h;
             let isOverride = false;
+            let capacityRatio = 0;
+            let slendernessRatio = 0;
 
             // v3.0: Check for user override (rectangular columns)
             if (state.defaultColumnB > 0) {
@@ -6217,12 +6083,14 @@
                 h = state.defaultColumnH > 0 ? state.defaultColumnH : b;  // h=0 means square
                 isOverride = true;
             } else {
-                // Required gross area (mm²)
+                // Required gross area (mm²) per NSCP 410.3.5.2
+                // Pn = 0.80 * [0.85 * f'c * (Ag - Ast) + fy * Ast]
+                // Pu = phi * Pn
                 const Ag_required = Pu / (phi * 0.80 * (0.85 * fc * (1 - rho) + fy * rho));
 
                 // Size as square column, round up to nearest 50mm
-                let side = Math.ceil(Math.sqrt(Ag_required) / 50) * 50;
-                side = Math.max(side, 200);  // Minimum 200mm per NSCP
+                let side = Math.ceil(Math.sqrt(Math.max(0, Ag_required)) / 50) * 50;
+                side = Math.max(side, 200);  // Minimum 200mm per NSCP 410.3.1
                 b = side;
                 h = side;
             }
@@ -6231,11 +6099,27 @@
             const Ag_actual = b * h;
             const Ast = Math.ceil(rho * Ag_actual);
 
+            // v3.16: Capacity check (DCR - demand/capacity ratio)
+            const Pn_max = phi * 0.80 * (0.85 * fc * (Ag_actual - Ast) + fy * Ast) / 1000; // kN
+            capacityRatio = Pn_max > 0 ? Pu_kN / Pn_max : 0;
+
+            // v3.16: Slenderness ratio check (klu/r)
+            const lu = height_m * 1000; // unsupported length in mm
+            const r = Math.min(b, h) * 0.3; // radius of gyration (0.3h for rectangular)
+            const k = 1.0; // effective length factor (braced frame)
+            slendernessRatio = r > 0 ? (k * lu) / r : 0;
+
             // v3.0: Calculate column self-weight
             const volume_m3 = (b / 1000) * (h / 1000) * height_m;
             const selfWeight_kN = volume_m3 * state.concreteDensity;
 
-            return { b, h, Ast, selfWeight_kN, isOverride };
+            return {
+                b, h, Ast, selfWeight_kN, isOverride,
+                capacityRatio,
+                slendernessRatio,
+                isSlender: slendernessRatio > 22, // NSCP 410.10.1 limit for braced frames
+                Pn_max_kN: Pn_max
+            };
         }
 
         /**
@@ -6253,22 +6137,31 @@
                 h = state.defaultBeamH;
                 b = state.defaultBeamB || 250;
             } else {
-                // Auto-size using NSCP span-to-depth ratio
+                // Auto-size using NSCP Table 409.3.1.1 (minimum thickness)
+                // One end continuous: L/18.5, Both ends continuous: L/21
+                // Simply supported: L/16, Cantilever: L/8
                 const L = span_m * 1000;  // Convert to mm
 
-                // Minimum depth per NSCP based on span
-                // Simply supported: L/16, Cantilever: L/8
                 const minDepthRatio = isCantilever ? 8 : 16;
                 h = Math.ceil((L / minDepthRatio) / 50) * 50;  // Round to 50mm
                 h = Math.max(h, 300);  // Minimum 300mm depth
 
-                // Use user-provided width or calculate from depth
+                // Width: minimum 200mm, typically b >= 0.3h for ductile frames (NSCP 421.5.1.3)
                 b = state.defaultBeamB > 0
                     ? state.defaultBeamB
-                    : Math.max(200, Math.ceil((h * 0.5) / 50) * 50);
+                    : Math.max(200, Math.ceil((h * 0.4) / 50) * 50);
             }
 
-            return { b: b, h: h };
+            // v3.16: Aspect ratio check (h/b should be <= 3 for ductile beams per NSCP 421.5.1.3)
+            const aspectRatio = h / b;
+            const spanToDepthRatio = (span_m * 1000) / h;
+
+            return {
+                b, h,
+                aspectRatio,
+                spanToDepthRatio,
+                isAdequate: spanToDepthRatio <= (isCantilever ? 8 : 16)
+            };
         }
 
         /**
@@ -8633,21 +8526,24 @@
                 document.getElementById('themeBtn-midnight')?.classList.add('active');
             } else if (theme === 'blueprint') {
                 document.getElementById('themeBtn-papermatte')?.classList.add('active');
+            } else if (theme === 'light') {
+                document.getElementById('themeBtn-light')?.classList.add('active');
             }
 
             // Update canvas background for 3D view
             if (typeof draw === 'function') draw();
 
-            // v3.0 FIX: Update 3D renderer background color based on theme
+            // v3.16: Update 3D renderer background color based on theme
             if (typeof renderer3D !== 'undefined' && renderer3D) {
-                if (theme === 'blueprint') {
-                    renderer3D.setClearColor(0xf5f5f0); // Off-white for Blueprint
-                } else {
-                    renderer3D.setClearColor(0x0a0d10); // Dark for Midnight
-                }
+                const bgColors = {
+                    dark: 0x1b1e24,
+                    light: 0xf1f3f5,
+                    blueprint: 0xf0f0e8
+                };
+                renderer3D.setClearColor(bgColors[theme] || 0x1b1e24);
             }
 
-            console.log(`v3.0: Theme changed to ${ theme } `);
+            console.log(`v3.16: Theme changed to ${theme}`);
         }
 
         // v3.0: Load saved theme on startup
@@ -9705,7 +9601,7 @@
                 // v3.0 FIX: Skip custom beams - they belong to specific floors only
                 if (beam.isCustom) continue;
                 // v3.0 FIX: Skip cantilever and edge beams - tie beams only connect main grid columns
-                if (bea        ilev         m.isEdgeBeam) continue;
+                if (beam.isCantilever || beam.isEdgeBeam) continue;
 
                 const length = Math.sqrt(
                     Math.pow(beam.x2 - beam.x1, 2) +
@@ -9999,7 +9895,8 @@
             let footingVol = 0;
             const footingDepth = 0.3;  // Standard 300mm
             for (let col of activeColumns) {
-                if (col.footingSize && !co        loor         nly non-planted columns have footi                        footingVol += col.footingSize * col.footingSize * footingDepth;
+                if (col.footingSize && !col.isPlanted) { // only non-planted columns have footings
+                    footingVol += col.footingSize * col.footingSize * footingDepth;
                 }
             }
 
@@ -10199,7 +10096,7 @@
 
                 } catch (err) {
                     console.error('Failed to load project:', err);
-                    alert('Failed         proj         err.message);
+                    alert('Failed to load project: ' + err.message);
                 }
             };
             reader.readAsText(file);
@@ -10222,19 +10119,20 @@
             state.xSpans = [4.0, 4.0];
             state.ySpans = [5.0, 5.0];
             state.cantilevers = { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] };
-            s        ors                     { id: '2F', name: '2nd Floor', dlSuper: 2.0, liveLoad: 2.0, slabThicknes         eight: 3.0, wallLoad: 6.0, isRoof: false },
+            state.floors = [
+                { id: '2F', name: '2nd Floor', dlSuper: 2.0, liveLoad: 2.0, slabThickness: 150, height: 3.0, wallLoad: 6.0, isRoof: false },
                 { id: 'RF', name: 'Roof', dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, height: 3.0, wallLoad: 0, isRoof: true }
             ];
-            st        entF          = 0;
+            state.currentFloorIndex = 0;
             state.gfSuspended = false;
-                 .columns = [];
+            state.columns = [];
             state.beams = [];
             state.slabs = [];
             state.nextCustomBeamId = 1;
 
             // Reset UI inputs
             document.getElementById('gfSuspended').checked = false;
-            document.get        yId(         nSection').style.display = 'none';
+            document.getElementById('elevationSection').style.display = 'none';
             document.getElementById('buildingType').value = 'residential';
             document.getElementById('fcInput').value = '21';
             document.getElementById('fyInput').value = '415';
@@ -11155,7 +11053,8 @@ function populateBBS() {
     if (state.tieBeamW && state.tieBeamH) {
         addHeader('TIE BEAMS');
         const tbW = state.tieBeamW * 1000, tbH = state.tieBeamH * 1000; // mm
-        c        ia =             const avgSpan = (state.xSpans.reduce         > a + b, 0) + state.ySpans.reduce((a, b) => a + b, 0)) /
+        const tbDia = 16; // mm
+        const avgSpan = (state.xSpans.reduce((a, b) => a + b, 0) + state.ySpans.reduce((a, b) => a + b, 0)) /
             (state.xSpans.length + state.ySpans.length);
         const nTB = state.columns.filter(c => c.active !== false && !c.isPlanted).length;
         const tbLapLen = 40 * tbDia / 1000;
@@ -11485,7 +11384,8 @@ function checkFdnStability() {
 
     const numFloors = state.floors.length;
     const floorH = state.floors[0]?.height || 3.0;
-    const totalH = num         flo         const buildingW = state.xSp         e((a, b) => a + b, 0);
+    const totalH = numFloors * floorH;
+    const buildingW = state.xSpans.reduce((a, b) => a + b, 0);
     const buildingD = state.ySpans.reduce((a, b) => a + b, 0);
 
     // Total building weight
@@ -11495,9 +11395,11 @@ function checkFdnStability() {
         W += col.totalLoadWithDL || col.totalLoad || 0;
     });
 
-    // Lateral force (approximate: 10% of W         mic)         t H = 0.10 * W;
+    // Lateral force (approximate: 10% of W for seismic)
+    const H = 0.10 * W;
 
-    // Overturning mo         const OTM = H * totalH * 0.67; // at 2/3 height
+    // Overturning moment
+    const OTM = H * totalH * 0.67; // at 2/3 height
 
     // Resisting moment
     const RM_x = W * buildingW / 2;
@@ -11656,8 +11558,8 @@ function calculateSeismic() {
     html += '<tr><td>Soil Profile</td><td>' + soil + '</td><td>Ca=' + Ca.toFixed(2) + ' Cv=' + Cv.toFixed(2) + '</td></tr>';
     html += '<tr><td>Building Height</td><td>' + totalHeight.toFixed(1) + ' m</td><td>' + numFloors + ' stories</td></tr>';
     html += '<tr><td>Period T</td><td>' + T.toFixed(3) + ' sec</td><td>Ct=' + Ct + '</td></tr>';
-    html += '<tr><td>Cs (calculated)</td><td>' + Cs_calc.toFixed(4        d><t         *T)</td></tr>';
-    html += '<tr><td>Cs (max)</td><td>' + C         ixed(4) + '</td><td>2.5*Ca*I/R</td></tr>';
+    html += '<tr><td>Cs (calculated)</td><td>' + Cs_calc.toFixed(4) + '</td><td>Cv*I/(R*T)</td></tr>';
+    html += '<tr><td>Cs (max)</td><td>' + Cs_max.toFixed(4) + '</td><td>2.5*Ca*I/R</td></tr>';
     html += '<tr><td>Cs (min)</td><td>' + Cs_min.toFixed(4) + '</td><td>0.11*Ca*I</td></tr>';
     html += '<tr style="font-weight:bold; border-top:2px solid #000;"><td>Cs (governing)</td><td>' + Cs.toFixed(4) + '</td><td></td></tr>';
     html += '<tr><td>Building Weight W</td><td>' + W.toFixed(0) + ' kN</td><td></td></tr>';
@@ -11723,10 +11625,11 @@ function calculateWind() {
         const qz = 0.613 * Kz * I_w * Math.pow(V * 1000 / 3600, 2) / 1000; // kPa
         const Cp = 0.8; // windward
         const G = 0.85; // gust factor
-        const p = qz * G * Cp; //        pres             const tributaryH = floor.          3.0;
+        const p = qz * G * Cp; // wind pressure
+        const tributaryH = floor.height || 3.0;
         const F = p * buildingWidth * tributaryH; // force on this story
 
-        storyHtml += '<tr><td>' + floor.id + '</td><td>        .toF          '</td><td>' + Kz.toFixed(3) + '</td><td>' + qz         3) + '</td><td><strong>' + F.toFixed(1) + '</strong></td></tr>';
+        storyHtml += '<tr><td>' + floor.id + '</td><td>' + cumH.toFixed(1) + '</td><td>' + Kz.toFixed(3) + '</td><td>' + qz.toFixed(3) + '</td><td><strong>' + F.toFixed(1) + '</strong></td></tr>';
     });
 
     const wsBody = document.getElementById('windStoryBody');
@@ -11800,19 +11703,21 @@ function checkAllColumns() {
     const tbody = document.getElementById('colDesignBody');
     if (!tbody) return;
 
+    let html = '';
     const colGroups = {};
     state.columns.forEach(col => {
-            col.         = false) return;
-        const b = co         edB || 250;
+        if (col.active === false) return;
+        const b = col.suggestedB || 250;
         const h = col.suggestedH || 250;
         const key = b + 'x' + h;
         if (!colGroups[key]) colGroups[key] = { b, h, cols: [] };
         colGroups[key].cols.push(col);
-    })        et h         
+    });
+
     Object.values(colGroups).forEach(grp => {
-        const b = grp         rp.h;
+        const b = grp.b, h = grp.h;
         const Ag = b * h;
-              rho = 0.01; // 1% minimum
+        const rho = 0.01; // 1% minimum
         const Ast = rho * Ag;
         const Pn = 0.80 * (0.85 * fc * (Ag - Ast) + fy * Ast) / 1000; // kN
         const phiPn = phi * Pn;
@@ -11837,9 +11742,11 @@ function checkAllColumns() {
                 '<td>' + (rho * 100).toFixed(1) + '</td>' +
                 '<td>' + nBars + '-D' + barDia + '</td>' +
                 '<td>D' + tieSize + '@' + tieSpacing + '</td>' +
-                '<td style="font-weight:bold;' + (status === 'OK' ? 'color:green;' : 'color:red;'         + s         </td>' +
+                '<td style="font-weight:bold;' + (status === 'OK' ? 'color:green;' : 'color:red;') + '">' + status + '</td>' +
                 '</tr>';
-        });             tbody.innerHTML = html || '<tr><td colspan="9">No columns</td></tr>';
+        });
+    });
+    tbody.innerHTML = html || '<tr><td colspan="9">No columns</td></tr>';
 }
 
 // --- SLAB DESIGN (ACI 318-14) ---
@@ -11885,8 +11792,8 @@ function designAllSlabs() {
         const As = rho * 1000 * d; // mm2/m
 
         const barDia = 12;
-        const Ab = Math.P        ia *          4;
-        const spacing = Math.min(Math.flo         000 / As), 3 * t, 450);
+        const Ab = Math.PI * barDia * barDia / 4;
+        const spacing = Math.min(Math.floor(Ab * 1000 / As), 3 * t, 450);
 
         html += '<tr>' +
             '<td>S' + (i + 1) + '</td>' +
@@ -11925,12 +11832,12 @@ function calculateStaircase() {
     const LL = 4.8; // kN/m2 for stairs (NSCP)
 
     // Factored
-    const wu = 1.2 * totalDL +        L;
+    const wu = 1.2 * totalDL + 1.6 * LL;
 
-         tml = '';
-    html += '<tr>         /td><td>' + rise + ' mm</td><td></td></tr>';
+    let html = '';
+    html += '<tr><td>Rise</td><td>' + rise + ' mm</td><td></td></tr>';
     html += '<tr><td>Tread</td><td>' + tread + ' mm</td><td></td></tr>';
-    html += '        Wais         ss</td><td>' + waist + ' mm</td><t         tr>';
+    html += '<tr><td>Waist Thickness</td><td>' + waist + ' mm</td><td></td></tr>';
     html += '<tr><td>Slope Angle</td><td>' + theta.toFixed(1) + '</td><td>degrees</td></tr>';
     html += '<tr><td>Effective Thickness</td><td>' + tEff.toFixed(0) + '</td><td>mm</td></tr>';
     html += '<tr style="border-top:1px solid #ccc;"><td>Slab Dead Load</td><td>' + slabDL.toFixed(2) + '</td><td>kN/m2</td></tr>';
@@ -11987,8 +11894,8 @@ function calculateBlockwalls() {
     const openPct = parseInt(document.getElementById('openingPct')?.value || 20);
 
     // CHB unit weights per NSCP (kN/m² of wall face)
-    const chbWeights = {        77,          , 200: 3.39 }; // kN/m²
-    const chbWt = chbWeights[chbSi         33;
+    const chbWeights = { 100: 1.77, 150: 2.33, 200: 3.39 }; // kN/m²
+    const chbWt = chbWeights[chbSize] || 2.33;
 
     // Plaster: 23 kN/m³ * thickness (both sides)
     const plasterWt = 2 * (plaster / 1000) * 23; // kN/m²
@@ -12050,8 +11957,8 @@ function populateRebarSchedule() {
 
     // Footing rebar
     const ftBody = document.getElementById('rebarFootingBody');
-    if (ftBody) {         con         gTypes = {};
-        state.columns.forEa          {
+    if (ftBody) { const footingTypes = {};
+        state.columns.forEach(col => {
             if (col.active === false || !col.footingSize || col.isPlanted) return;
             const key = col.footingSize.toFixed(2);
             if (!footingTypes[key]) {
@@ -12062,7 +11969,7 @@ function populateRebarSchedule() {
 
         let html = '';
         let typeIdx = 1;
-        Object.values(foo        s).f          => {
+        Object.values(footingTypes).forEach(ft => {
             const fd = ft.design;
             html += `< tr >
                 <td>F${typeIdx} (×${ft.count})</td>
@@ -12081,8 +11988,8 @@ function populateRebarSchedule() {
     const colBody = document.getElementById('rebarColumnBody');
     if (colBody) {
         const colTypes = {};
-        stat         .forEach(col => {
-            if (col.active === fal         n;
+        state.columns.forEach(col => {
+            if (col.active === false) return;
             const b = col.suggestedB || 250;
             const h = col.suggestedH || 250;
             const key = b + 'x' + h;
@@ -12109,17 +12016,17 @@ function populateRebarSchedule() {
                 <td>${ct.b}×${ct.h}</td>
                 <td>${ct.maxPu.toFixed(0)}</td>
                 <td>${(rho_min * 100).toFixed(1)}</td>
-                <td>${nBars}-ø${barDia        
+                <td>${nBars}-ø${barDia}mm</td>
                 <td>ø${tieSize}mm @ ${tieSpacing}mm</td>
-            > `;
+            </tr>`;
         });
-        colBody.innerHTML = html || '<tr><td colspan="6">No col         </tr>';
+        colBody.innerHTML = html || '<tr><td colspan="6">No columns found</td></tr>';
     }
 }
 
 // --- BILL OF MATERIALS ---
 function populateBOM() {
-    cons          document.getElementById('bomBody');
+    const tbody = document.getElementById('bomBody');
     if (!tbody) return;
 
     const numFloors = state.floors.length;
@@ -12180,14 +12087,14 @@ function populateBOM() {
 
 
 // ========== FOOTING STRUCTURAL DESIGN (NSCP 2015 / ACI 318-14) ==========
-        //         : si         ching shear, wide-beam shear,          reinforcement
+        // Checks: sizing, punching shear, wide-beam shear, flexure, reinforcement
         // Called after calculateFootingSizes() to add structural checks
 
         function designFooting(col) {
-            if        ooti          col.footingSize <= 0) return;
+            if (!col.footingSize || col.footingSize <= 0) return;
 
-              nst fc = state.fc || 21;        // MPa
-            cons         ate.fy || 415;       // MPa
+            const fc = state.fc || 21;        // MPa
+            const fy = state.fy || 415;       // MPa
             const gamma_c = 24;               // kN/m³
             const phi_v = 0.75;               // Shear reduction factor
             const phi_b = 0.90;               // Flexure reduction factor
@@ -12338,8 +12245,8 @@ function populateBOM() {
 
 
         // ========== STRUCTURAL EXPORT FUNCTIONS ==========
-        //        Prod         ade STAAD Pro / ETABS / IFC Exporters
-         / Written for Tributary Pro by Antigravity          )
+        // Production-grade STAAD Pro / ETABS / IFC Exporters
+        // Written for Tributary Pro by Antigravity Engineering
 
         /**
          * Helper: chunk an array into groups of `size` to respect STAAD 79-char line limit
@@ -12355,11 +12262,12 @@ function populateBOM() {
          */
         function isColumnActiveForExport(col, floorId) {
             if (col.active === false) return false;
-            if          vePerFloor && col.activePerFloor[floorId] === false) retur                     return true;
+            if (col.activePerFloor && col.activePerFloor[floorId] === false) return false;
+            return true;
         }
 
         /**
-                   download a blob as a file
+         * Helper: download a blob as a file
          */
         function downloadBlob(content, filename, mimeType) {
             const blob = new Blob([content], { type: mimeType || 'application/octet-stream' });
@@ -12368,8 +12276,9 @@ function populateBOM() {
             a.style.display = 'none';
             a.href = url;
             a.download = filename;
-            document.body.app        (a);             a.click();
-            setTimeout         document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
         }
 
         // ================================================================
@@ -12426,11 +12335,13 @@ function populateBOM() {
             // --- 2. MEMBER INCIDENCES ---
             std += "MEMBER INCIDENCES\n";
 
-            // Column                     loors.forEach((floor, fi)                      const topIdx = fi + 1;
+            // Column members
+            state.floors.forEach((floor, fi) => {
+                const topIdx = fi + 1;
                 const botIdx = fi;
                 state.columns.forEach((col, ci) => {
                     if (col.active === false) return;
-                    const topNode        deId         dx);
+                    const topNode = getNodeId(ci, topIdx);
                     const botNode = getNodeId(ci, botIdx);
                     if (existingNodes.has(topNode) && existingNodes.has(botNode)) {
                         std += memId + " " + botNode + " " + topNode + "\n";
@@ -12505,19 +12416,20 @@ function populateBOM() {
             std += "DENSITY 23.5\n";
             std += "ALPHA 1E-5\n";
             std += "DAMP 0.05\n";
-                   "TY         TE\n";
-            std += "STRENGTH FCU " +         fc || 21) * 1000) + "\n";
+            std += "TYPE CONCRETE\n";
+            std += "STRENGTH FCU " + ((state.fc || 21) * 1000) + "\n";
             std += "END DEFINE MATERIAL\n\n";
 
             std += "CONSTANTS\n";
             std += "MATERIAL CONCRETE ALL\n\n";
 
             // --- 5. SUPPORTS ---
-                    SUPP                     const suppo          [];
+            std += "SUPPORTS\n";
+            const supportNodes = [];
             state.columns.forEach((col, ci) => {
                 if (col.active === false) return;
-                if (!col.sta        && !         nted) {
-                    const nid = getNode         ;
+                if (!col.startFloor && !col.isPlanted) {
+                    const nid = getNodeId(ci, 0);
                     if (existingNodes.has(nid)) supportNodes.push(nid);
                 }
             });
@@ -12532,7 +12444,8 @@ function populateBOM() {
             // Dead Load
             std += "LOAD 1 LOADTYPE Dead TITLE DEAD LOAD\n";
             std += "SELFWEIGHT Y -1.0\n";
-            if (wallL        gth                        std += "MEMBER LOAD\n";
+            if (wallLoads && wallLoads.length > 0) {
+                std += "MEMBER LOAD\n";
                 wallLoads.forEach(wl => {
                     std += wl.id + " UNI GY " + wl.load.toFixed(2) + "\n";
                 });
@@ -16255,27 +16168,39 @@ Reference NSCP sections when applicable.Format numbers with units(kN, mm, m).`,
         });
     </script>
 
-    <!-- FutolTech Footer -->
-    <footer style="
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: var(--header-bg);
-        border-top: 1px solid var(--border);
-        padding: 6px 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 0.7rem;
-        color: var(--text-muted);
-        z-index: 1000;
-    ">
-        <span style="font-weight: 500; color: var(--text-primary);">FutolTech</span>
-        <span style="margin: 0 8px;">|</span>
-        <span>Engineering & Project Systems</span>
-        <span style="margin-left: 16px; opacity: 0.6;">© 2024-2025</span>
-    </footer>
+    <!-- Professional Status Bar -->
+    <div class="status-bar" id="statusBar">
+        <div class="status-item">
+            <span class="status-indicator" id="statusIndicator"></span>
+            <span class="status-value" id="statusText">Ready</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span class="status-label">Code:</span>
+            <span class="status-value" id="statusCode">NSCP 2015</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span class="status-label">Grid:</span>
+            <span class="status-value" id="statusGrid">2x2</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span class="status-label">Floors:</span>
+            <span class="status-value" id="statusFloors">3</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item">
+            <span class="status-label">Members:</span>
+            <span class="status-value" id="statusMembers">-</span>
+        </div>
+        <div class="status-separator"></div>
+        <div class="status-item" style="margin-left: auto;">
+            <span class="status-label">FutolTech</span>
+            <span style="margin: 0 4px; opacity:0.3;">|</span>
+            <span class="status-value" style="opacity: 0.6;">Engineering Systems</span>
+        </div>
+    </div>
 
 </body>
 
