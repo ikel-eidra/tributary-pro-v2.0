@@ -1451,7 +1451,7 @@
                 <div class="param-grid">
                     <div class="param-item">
                         <label>f'c (MPa)</label>
-                        <select id="fcInput" onchange="state.fc = parseFloat(this.value); calculate();">
+                        <select id="fcInput" onchange="state.fc = safeFloat(this.value, 21); calculate();">
                             <option value="17">17 MPa</option>
                             <option value="21" selected>21 MPa</option>
                             <option value="24">24 MPa</option>
@@ -1461,7 +1461,7 @@
                     </div>
                     <div class="param-item">
                         <label>fy (MPa)</label>
-                        <select id="fyInput" onchange="state.fy = parseFloat(this.value); calculate();">
+                        <select id="fyInput" onchange="state.fy = safeFloat(this.value, 275); calculate();">
                             <option value="275">Grade 40 (275)</option>
                             <option value="415" selected>Grade 60 (415)</option>
                         </select>
@@ -1471,24 +1471,24 @@
                     <div class="param-item">
                         <label>Column b (mm)</label>
                         <input type="number" id="columnWidthInput" value="0" min="0" max="600" step="50"
-                            onchange="state.defaultColumnB = parseInt(this.value); calculate();"
+                            onchange="state.defaultColumnB = safeInt(this.value, 300); calculate();"
                             title="0 = Auto (NSCP Pu sizing)">
                     </div>
                     <div class="param-item">
                         <label>Column h (mm)</label>
                         <input type="number" id="columnDepthInput" value="0" min="0" max="800" step="50"
-                            onchange="state.defaultColumnH = parseInt(this.value); calculate();"
+                            onchange="state.defaultColumnH = safeInt(this.value, 300); calculate();"
                             title="0 = Auto (same as b)">
                     </div>
                     <div class="param-item">
                         <label>Beam b (mm)</label>
                         <input type="number" id="beamWidthInput" value="250" min="200" max="500" step="25"
-                            onchange="state.defaultBeamB = parseInt(this.value); calculate();">
+                            onchange="state.defaultBeamB = safeInt(this.value, 250); calculate();">
                     </div>
                     <div class="param-item">
                         <label>Beam h (mm)</label>
                         <input type="number" id="beamDepthInput" value="0" min="0" max="800" step="50"
-                            onchange="state.defaultBeamH = parseInt(this.value); calculate();"
+                            onchange="state.defaultBeamH = safeInt(this.value, 400); calculate();"
                             title="0 = Auto (use L/16 rule)">
                     </div>
                 </div>
@@ -3215,6 +3215,16 @@
         // By FutolTech | Engineering & Project Systems
         // ========================================
 
+        // Production mode: suppress verbose debug logs, keep errors/warnings
+        const DEBUG = false;
+        const _origLog = console.log;
+        if (!DEBUG) console.log = function() {};
+
+        // Safe number parsing with fallback — prevents NaN from corrupting state
+        function safeFloat(val, fallback) { const n = parseFloat(val); return isNaN(n) ? fallback : n; }
+        function safeInt(val, fallback) { const n = parseInt(val, 10); return isNaN(n) ? fallback : n; }
+        function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
         // ========== STATE ==========
         const state = {
             xSpans: [4.0, 4.0],      // X-direction bay sizes (m)
@@ -4873,20 +4883,7 @@
             console.log(`v3.0: Tie beam sizing - ${(state.tieBeamW * 1000).toFixed(0)}×${(state.tieBeamH * 1000).toFixed(0)}mm`);
         }
 
-        /**
-         * v3.0: Check if current floor is at or above the start floor
-         * Used for planted columns that don't go to ground
-         * @param {string} currentFloorId - The floor being calculated
-         * @param {string} startFloorId - The column's starting floor
-         * @returns {boolean} true if column exists at this floor
-         */
-        function isFloorAtOrAbove(currentFloorId, startFloorId) {
-            const floorIds = state.floors.map(f => f.id);
-            const currentIdx = floorIds.indexOf(currentFloorId);
-            const startIdx = floorIds.indexOf(startFloorId);
-            // Higher index = higher floor (GF=0, 2F=1, RF=2)
-            return currentIdx >= startIdx;
-        }
+        // isFloorAtOrAbove defined earlier (line ~4135)
 
         /**
          * Calculate column loads for a specific floor
@@ -10361,83 +10358,37 @@ function clearAIChat() {
 
 // ========== v3.14: SAVE/LOAD (.tpro) + UNDO + FINAL FEATURES ==========
 
-// --- SAVE/LOAD SYSTEM ---
-function saveProject() {
-    const data = {
-        version: '3.14',
-        timestamp: new Date().toISOString(),
-        state: JSON.parse(JSON.stringify(state))
-    };
-    const json = JSON.stringify(data, null, 2);
-    const blob = new Blob([json], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'tributary_project_' + new Date().toISOString().slice(0,10) + '.tpro';
-    a.click();
-    URL.revokeObjectURL(url);
-}
-
-function loadProject() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = '.tpro,.json';
-    input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (ev) => {
-            try {
-                const data = JSON.parse(ev.target.result);
-                if (data.state) {
-                    Object.assign(state, data.state);
-                    if (typeof calculate === 'function') calculate();
-                    if (typeof draw === 'function') draw();
-                    alert('Project loaded: ' + file.name);
-                }
-            } catch (err) {
-                alert('Error loading file: ' + err.message);
-            }
-        };
-        reader.readAsText(file);
-    };
-    input.click();
-}
-
-// --- UNDO SYSTEM (10 levels) ---
-const undoStack = [];
-const UNDO_MAX = 10;
-
-function pushUndo() {
-    undoStack.push(JSON.stringify(state));
-    if (undoStack.length > UNDO_MAX) undoStack.shift();
-}
-
-function undo() {
-    if (undoStack.length === 0) return;
-    const prev = JSON.parse(undoStack.pop());
-    Object.assign(state, prev);
-    if (typeof draw === 'function') draw();
-}
-
-// Keyboard shortcut: Ctrl+Z = undo, Ctrl+S = save
+// saveProject/loadProject defined earlier (~line 9943)
+// Keyboard shortcuts: Ctrl+Z undo, Ctrl+Y/Ctrl+Shift+Z redo, Ctrl+S save, Escape cancel modes
 document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.key === 'z') { e.preventDefault(); undo(); }
-    if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveProject(); }
-    if (e.ctrlKey && e.key === 'o') { e.preventDefault(); loadProject(); }
+    // Skip if user is typing in an input field
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+
+    if (e.ctrlKey && e.key === 'z' && !e.shiftKey) { e.preventDefault(); if (typeof undo === 'function') undo(); }
+    if ((e.ctrlKey && e.key === 'y') || (e.ctrlKey && e.shiftKey && e.key === 'Z')) { e.preventDefault(); if (typeof redo === 'function') redo(); }
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); if (typeof saveProject === 'function') saveProject(); }
+    if (e.key === 'Escape') {
+        // Cancel beam drawing mode
+        if (state.addingBeam) { state.addingBeam = false; state.beamDrawStart = null; if (typeof draw === 'function') draw(); }
+        // Cancel planted column mode
+        if (state.placingPlantedColumn) { state.placingPlantedColumn = false; document.body.style.cursor = 'default'; }
+    }
+    if (e.key === 'Delete') {
+        // Delete selected members via context menu
+        if (typeof deleteSelectedMember === 'function') deleteSelectedMember();
+    }
+    // F key = fit view
+    if (e.key === 'f' && !e.ctrlKey) { if (typeof fitView === 'function') fitView(); }
 });
 
-// Hook into calculate to auto-push undo
-const _origCalc = typeof calculate === 'function' ? calculate : null;
-if (_origCalc) {
-    // We'll wrap it after DOM load
-}
+// Duplicate undo system removed — using the one defined at ~line 3355
+// Hook into calculate to auto-push undo (removed — no-op wrapper was dead code)
 
 // --- DASHBOARD ---
 function populateDashboard() {
     const el = document.getElementById('dashboardContent');
     if (!el) return;
-    
+
     const activeCols = state.columns.filter(c => c.active !== false);
     const activeBeams = state.beams.filter(b => !b.isCustom && !b.isCantilever);
     const numFloors = state.floors.length;
@@ -12894,267 +12845,29 @@ function populateBOM() {
         // ========== INIT ==========
 
         window.onload = function () {
-            // v3.15: Pre-fill Kimi API key if not set
-            if (!localStorage.getItem('kimiApiKey')) localStorage.setItem('kimiApiKey', 'sk-kimi-2nYOAdpc3ZpzZrSJOobdaOmfgrq8AfU2nJ8xex3byDQQwE1XMPzCxpdozzpfwPsS');
-            // v3.11: Auto-calculate on load
-            setTimeout(() => { if (typeof calculate === 'function') calculate(); }, 500);
-            initCanvas();
-            initPan();  // v2.4: Pan tool
-            renderSpans();
-            renderCantileverInputs();  // v3.0: Render cantilever inputs
-            renderFloorTabs();  // v2.3: Render floor tabs
-            calculate();
-            fitView();
+            const steps = [
+                ['initCanvas', initCanvas],
+                ['initPan', initPan],
+                ['renderSpans', renderSpans],
+                ['renderCantileverInputs', renderCantileverInputs],
+                ['renderFloorTabs', renderFloorTabs],
+                ['calculate', calculate],
+                ['fitView', fitView]
+            ];
+            let failed = false;
+            for (const [name, fn] of steps) {
+                try {
+                    fn();
+                } catch (err) {
+                    console.error(`Init step "${name}" failed:`, err);
+                    failed = true;
+                }
+            }
+            if (failed) {
+                const sb = document.getElementById('statusText');
+                if (sb) { sb.textContent = 'Init error — check console'; sb.style.color = 'var(--danger)'; }
+            }
         };
-
-        /**
-         * v3.0: Generate STAAD Content String
-         * Refactored to separate generation from download/copy logic.
-         */
-        function generateSTAADContent() {
-            // Header
-            let std = "STAAD SPACE\n";
-            std += "START JOB INFORMATION\n";
-            std += "ENGINEER DATE " + new Date().toDateString() + "\n";
-            std += "JOB NAME " + (state.floors.length + " Storey Building") + "\n";
-            std += "JOB CLIENT FutolStructure\n";
-            std += "END JOB INFORMATION\n";
-            std += "INPUT WIDTH 79\n";  // Standard input width
-            std += "UNIT METER KN\n\n";
-
-            // Save State to restore later
-            const oldBeams = [...state.beams];
-            const oldSlabs = [...state.slabs];
-            const oldCants = state.cantilevers;
-
-            // v3.0 FIX: Better node numbering to avoid collisions
-            // Node ID = (floorLevel * 1000) + columnIndex + 1
-            const getNodeId = (colIdx, floorIdx) => (floorIdx * 1000) + colIdx + 1;
-
-            // Track which nodes exist (for validation)
-            const existingNodes = new Set();
-
-            // --- 1. JOINT COORDINATES ---
-            std += "JOINT COORDINATES\n";
-
-            // Level 0 (Ground) - only columns that start from ground
-            state.columns.forEach((col, ci) => {
-                if (col.active === false) return;
-                if (!col.startFloor) {  // Starts from ground
-                    const nid = getNodeId(ci, 0);
-                    existingNodes.add(nid);
-                    std += `${ nid } ${ col.x.toFixed(3) } 0.000 ${ col.y.toFixed(3) }; \n`;
-                }
-            });
-
-            // Suspended Levels
-            let currentY = 0;
-            state.floors.forEach((floor, fi) => {
-                currentY += (floor.height || 3.0);
-                const floorIdx = fi + 1;
-                state.columns.forEach((col, ci) => {
-                    if (col.active === false) return;
-                    // v3.0: Check if column exists at this floor
-                    const isActiveHere = isColumnActiveOnFloor(col, floor.id);
-                    const startsBelow = !col.startFloor || isFloorAtOrAbove(floor.id, col.startFloor);
-
-                    if (isActiveHere && startsBelow) {
-                        const nid = getNodeId(ci, floorIdx);
-                        existingNodes.add(nid);
-                        std += `${ nid } ${ col.x.toFixed(3) } ${ currentY.toFixed(3) } ${ col.y.toFixed(3) }; \n`;
-                    }
-                });
-            });
-            std += "\n";
-
-            // --- 2. MEMBER INCIDENCES ---
-            std += "MEMBER INCIDENCES\n";
-            let memId = 1;
-            const columnMembers = [];  // Track column member IDs
-            const beamMembers = [];    // Track beam member IDs
-
-            // Columns (vertical members)
-            state.floors.forEach((floor, fi) => {
-                const topIdx = fi + 1;
-                const botIdx = fi;  // Previous floor (0 = ground)
-
-                state.columns.forEach((col, ci) => {
-                    if (col.active === false) return;
-
-                    const topNode = getNodeId(ci, topIdx);
-                    const botNode = getNodeId(ci, botIdx);
-
-                    // v3.0 FIX: Only create member if both nodes exist
-                    if (existingNodes.has(topNode) && existingNodes.has(botNode)) {
-                        std += `${ memId } ${ botNode } ${ topNode }; \n`;
-                        columnMembers.push(memId);
-                        memId++;
-                    }
-                });
-            });
-
-            // Beams (horizontal members)
-            const wallLoads = [];
-            const processedBeams = new Set();  // v3.0: Prevent duplicate beams
-
-            state.floors.forEach((floor, fi) => {
-                const floorIdx = fi + 1;
-                state.cantilevers = getCantilevers(floor.id);
-                generateSlabs(floor.id);
-                generateBeams(1.0, floor.wallLoad || 0);
-
-                state.beams.forEach(beam => {
-                    if (beam.isCantilever || beam.deleted) return;
-                    if (!beam.startCol || !beam.endCol) return;
-
-                    // v3.0: Create unique key to prevent duplicates
-                    const beamKey = `${ floorIdx } -${ beam.startCol } -${ beam.endCol } `;
-                    if (processedBeams.has(beamKey)) return;
-                    processedBeams.add(beamKey);
-
-                    const startColIdx = state.columns.findIndex(c => c.id === beam.startCol);
-                    const endColIdx = state.columns.findIndex(c => c.id === beam.endCol);
-
-                    if (startColIdx >= 0 && endColIdx >= 0) {
-                        const startNode = getNodeId(startColIdx, floorIdx);
-                        const endNode = getNodeId(endColIdx, floorIdx);
-
-                        // v3.0 FIX: Only create member if both nodes exist
-                        if (existingNodes.has(startNode) && existingNodes.has(endNode)) {
-                            std += `${ memId } ${ startNode } ${ endNode }; \n`;
-                            beamMembers.push(memId);
-                            if ((floor.wallLoad || 0) > 0) {
-                                wallLoads.push({ id: memId, load: -(floor.wallLoad || 0) });
-                            }
-                            memId++;
-                        }
-                    }
-                });
-            });
-            std += "\n";
-
-            // --- 3. PROPERTIES ---
-            std += "MEMBER PROPERTY AMERICAN\n";
-            if (columnMembers.length > 0) {
-                const colB = (state.columns[0]?.suggestedB || 300) / 1000;
-                const colH = (state.columns[0]?.suggestedH || 300) / 1000;
-                std += `${ columnMembers.join(' ') } PRIS YD ${ colH.toFixed(3) } ZD ${ colB.toFixed(3) } \n`;
-            }
-            if (beamMembers.length > 0) {
-                const beamB = (state.beams[0]?.suggestedB || 250) / 1000;
-                const beamH = (state.beams[0]?.suggestedH || 400) / 1000;
-                std += `${ beamMembers.join(' ') } PRIS YD ${ beamH.toFixed(3) } ZD ${ beamB.toFixed(3) } \n`;
-            }
-            std += "\n";
-
-            // --- 4. CONSTANTS (Concrete) ---
-            std += "CONSTANTS\n";
-            const E = (state.fc || 28) * 4700 * 1000;  // Ec = 4700*sqrt(fc) in kPa, simplified
-            std += `E ${ E.toFixed(0) } ALL\n`;
-            std += "POISSON 0.2 ALL\n";
-            std += "DENSITY 24 ALL\n";
-            std += "ALPHA 1E-5 ALL\n\n";
-
-            // --- 5. SUPPORTS ---
-            std += "SUPPORTS\n";
-            let supportNodes = [];
-            state.columns.forEach((col, ci) => {
-                if (col.active === false) return;
-                if (!col.startFloor) {
-                    const nid = getNodeId(ci, 0);
-                    if (existingNodes.has(nid)) supportNodes.push(nid);
-                }
-            });
-            if (supportNodes.length > 0) {
-                std += supportNodes.join(' ') + " FIXED\n\n";
-            }
-
-            // --- 6. LOADS ---
-            std += "LOAD 1 LOADTYPE Dead TITLE DEAD LOAD\n";
-            std += "SELFWEIGHT Y -1.0\n";
-
-            if (wallLoads.length > 0) {
-                std += "MEMBER LOAD\n";
-                wallLoads.forEach(wl => std += `${ wl.id } UNI GY ${ wl.load.toFixed(2) } \n`);
-            }
-
-            std += "FLOOR LOAD\n";
-            let elevation = 0;
-            state.floors.forEach(floor => {
-                elevation += (floor.height || 3.0);
-                const slabThick = (floor.slabThickness || state.slabThickness || 150) / 1000;
-                const dlSuper = floor.dlSuper || state.DL || 1.5;
-                const dl = -(dlSuper + (24 * slabThick));
-                std += `YRANGE ${ (elevation - 0.1).toFixed(3) } ${ (elevation + 0.1).toFixed(3) } FLOAD ${ dl.toFixed(3) } GY\n`;
-            });
-
-            std += "\nLOAD 2 LOADTYPE Live TITLE LIVE LOAD\n";
-            std += "FLOOR LOAD\n";
-            elevation = 0;
-            state.floors.forEach(floor => {
-                elevation += (floor.height || 3.0);
-                const ll = floor.liveLoad || state.LL || 2.0;
-                std += `YRANGE ${ (elevation - 0.1).toFixed(3) } ${ (elevation + 0.1).toFixed(3) } FLOAD ${ (-ll).toFixed(3) } GY\n`;
-            });
-
-            std += "\nLOAD COMB 3 TITLE 1.2DL + 1.6LL\n";
-            std += "1 1.2 2 1.6\n";
-
-            std += "\nPERFORM ANALYSIS\n";
-            std += "FINISH\n";
-
-            // Restore State
-            state.beams = oldBeams;
-            state.slabs = oldSlabs;
-            state.cantilevers = oldCants;
-            // Re-render
-            draw();
-
-            console.log(`STAAD Export: ${ existingNodes.size } nodes, ${ memId - 1 } members`);
-            return std;
-        }
-
-        function exportToSTAAD() {
-            try {
-                const std = generateSTAADContent();
-                const blob = new Blob([std], { type: 'application/octet-stream' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = `FutolStructure_Model_${ new Date().toISOString().split('T')[0] }.std`;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => { document.body.removeChild(a); URL.revokeObjectURL(url); }, 100);
-                alert('STAAD Model exported!\nCheck Downloads folder.');
-            } catch (err) {
-                alert('Export failed: ' + err.message);
-            }
-        }
-
-        function copySTAADToClipboard() {
-            try {
-                const std = generateSTAADContent();
-                navigator.clipboard.writeText(std).then(() => {
-                    alert('📋 Code copied to clipboard!\n\n1. Open Notepad\n2. Paste (Ctrl+V)\n3. Save as "Model.std"');
-                }).catch(err => {
-                    const textArea = document.createElement("textarea");
-                    textArea.value = std;
-                    document.body.appendChild(textArea);
-                    textArea.focus();
-                    textArea.select();
-                    try {
-                        document.execCommand('copy');
-                        alert('📋 Code copied to clipboard (Legacy Mode)!');
-                    } catch (err) {
-                        alert('Unable to copy. Please try Export button.');
-                    }
-                    document.body.removeChild(textArea);
-                });
-            } catch (err) {
-                alert('Copy failed: ' + err.message);
-            }
-        }
 
         // ========== v3.0: DXF EXPORT (AutoCAD) ==========
 
@@ -15817,26 +15530,6 @@ Reference NSCP sections when applicable.Format numbers with units(kN, mm, m).`,
                 console.log(`Deleted ${checkboxes.length} footings`);
             };
 
-            // Update Column Parameters - refreshes drawings when dimensions change
-            window.updateColumnParam = function (colId, param, value) {
-                const col = state.columns.find(c => c.id === colId || c.id === parseInt(colId));
-                if (col) {
-                    col[param] = parseInt(value) || 200;
-                    draw();
-                    render3DFrame();
-                }
-            };
-
-            // Update Footing Parameters - refreshes drawings when dimensions change
-            window.updateFootingParam = function (colId, param, value) {
-                const col = state.columns.find(c => c.id === colId || c.id === parseInt(colId));
-                if (col) {
-                    col[param] = parseInt(value);
-                    draw();
-                    render3DFrame();
-                }
-            };
-
             // Delete Selected Slabs - marks as deleted and refreshes drawings
             window.deleteSelectedSlabs = function () {
                 const checkboxes = document.querySelectorAll('#slabScheduleBody .delete-cb:checked');
@@ -16091,45 +15784,6 @@ Reference NSCP sections when applicable.Format numbers with units(kN, mm, m).`,
                     });
                 }
             };
-
-            window.updateColumnParam = function (id, param, value) {
-                const col = state.columns.find(c => c.id === id);
-                if (col) {
-                    const val = parseFloat(value);
-                    if (!isNaN(val)) {
-                        col[param] = val;
-                        // Force Recalculate and Draw
-                        calculate();
-                        draw();
-                        console.log(`Updated Col ${id} ${param} = ${val}`);
-                    }
-                }
-            };
-
-            window.updateBeamParam = function (id, param, value) {
-                const beam = state.beams.find(b => b.id === id);
-                if (beam) {
-                    const val = parseFloat(value);
-                    if (!isNaN(val)) {
-                        beam[param] = val;
-
-                        // v3.7: Recalculate and update ALL views
-                        calculate();     // Recalculate loads
-                        draw();          // Update 2D canvas
-
-                        // Update 3D view if visible
-                        if (typeof update3DView === 'function') {
-                            update3DView();
-                        }
-
-                        // Re-render schedule to show updated values
-                        renderScheduleBeams();
-
-                        console.log(`Updated Beam ${id} ${param} = ${val}`);
-                    }
-                }
-            };
-
 
             // v3.5: Close modal when clicking outside
             window.onclick = function (event) {
