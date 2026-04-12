@@ -3713,12 +3713,6 @@
         // including: beam mode, beam deletion, slab void, column context menu, and Shift+Click-to-place
 
         // v3.0: Finish beam drawing (placeholder for beam draw mode)
-        function finishBeamDraw(e) {
-            // Beam drawing logic is in draw() - this handles mouseup
-            if (!state.addingBeam || !state.beamDrawStart) return;
-            // Beam completion logic handled elsewhere
-        }
-
         // ========== SPAN UI ==========
         function renderSpans() {
             renderSpanInputs('x', state.xSpans, 'xSpansContainer');
@@ -6476,20 +6470,6 @@
             hideColumnMenu();
         }
 
-        // v3.0: Toggle slab as void (for U-shape/L-shape layouts) - per floor
-        function toggleSlabVoid(slabId) {
-            const voidSlabs = getFloorVoidSlabs();
-            const idx = voidSlabs.indexOf(slabId);
-            if (idx >= 0) {
-                voidSlabs.splice(idx, 1); // Remove from void
-                console.log(`v3.0: Slab ${ slabId } restored on floor`);
-            } else {
-                voidSlabs.push(slabId); // Mark as void
-                console.log(`v3.0: Slab ${ slabId } marked as void on floor`);
-            }
-            calculate(); // Recalculate loads
-        }
-
         // v3.0: Toggle beam adding mode
         function toggleBeamMode() {
             state.addingBeam = !state.addingBeam;
@@ -6506,13 +6486,6 @@
                 canvas.style.cursor = 'default';
                 console.log('v3.0: Beam drawing mode OFF');
             }
-        }
-
-        // v3.0: Get custom beams for current floor
-        function getFloorCustomBeams() {
-            const floor = state.floors[state.currentFloorIndex];
-            if (!floor.customBeams) floor.customBeams = [];
-            return floor.customBeams;
         }
 
         // v3.0: Get floor void slabs (per floor)
@@ -6601,45 +6574,6 @@
                 updateUndoButton();
                 calculate();
             }
-        }
-
-        // v3.0: Toggle slab void state (PER-FLOOR - only affects current floor)
-        function toggleSlabVoid(slabId) {
-            const currentFloor = state.floors[state.currentFloorIndex];
-            if (!currentFloor) return;
-
-            // Initialize per-floor void slabs array if needed
-            if (!currentFloor.voidSlabs) currentFloor.voidSlabs = [];
-
-            // Check current state
-            const idx = currentFloor.voidSlabs.indexOf(slabId);
-            const wasVoid = idx >= 0;
-
-            // v3.0: Push to undo stack before toggling
-            state.undoStack.push({
-                type: 'voidSlab',
-                data: { slabId, wasVoid },
-                floorId: currentFloor.id,
-                timestamp: Date.now()
-            });
-
-            // Toggle in floor's void list
-            if (wasVoid) {
-                currentFloor.voidSlabs.splice(idx, 1); // Remove - no longer void
-                console.log(`v3.0: Slab ${ slabId } restored on floor ${ currentFloor.id } (saved to undo)`);
-            } else {
-                currentFloor.voidSlabs.push(slabId); // Add as void
-                console.log(`v3.0: Slab ${ slabId } set as VOID on floor ${ currentFloor.id } (saved to undo)`);
-            }
-
-            // Also update the slab object directly
-            const slab = state.slabs.find(s => s.id === slabId);
-            if (slab) {
-                slab.isVoid = !slab.isVoid;
-            }
-
-            updateUndoButton();
-            calculate(); // Recalc loads
         }
 
         // v3.0: Toggle structural beam deleted state (PER-FLOOR)
@@ -8994,26 +8928,7 @@
                 selCtx.fillText(isWindowSelection ? '⬜ WINDOW' : '🔲 CROSSING', x + 5, y - 5);
             }
 
-        
-    // v3.11: Material definition for Revit Structure
-    const matConcrete = nid();
-    ifc += matConcrete + "= IFCMATERIAL('Concrete - " + (state.fc || 21) + "MPa');\n";
-    const matLayer = nid();
-    ifc += matLayer + "= IFCMATERIALLAYER(" + matConcrete + ",0.3,.U.);\n";
-    const matLayerSet = nid();
-    ifc += matLayerSet + "= IFCMATERIALLAYERSET((" + matLayer + "),'Concrete');\n";
-    const propSingle1 = nid();
-    ifc += propSingle1 + "= IFCPROPERTYSINGLEVALUE('CompressiveStrength',$,IFCPRESSUREMEASURE(" + ((state.fc || 21) * 1000000) + ".0),$);\n";
-    const propSingle2 = nid();
-    ifc += propSingle2 + "= IFCPROPERTYSINGLEVALUE('ConcreteDensity',$,IFCMASSDENSITYMEASURE(2400.0),$);\n";
-    const propSingle3 = nid();
-    ifc += propSingle3 + "= IFCPROPERTYSINGLEVALUE('YoungsModulus',$,IFCMODULUSOFELASTICITYMEASURE(" + (4700 * Math.sqrt(state.fc || 21) * 1000000) + ".0),$);\n";
-    const propSingle4 = nid();
-    ifc += propSingle4 + "= IFCPROPERTYSINGLEVALUE('PoissonRatio',$,IFCPOSITIVERATIOMEASURE(0.17),$);\n";
-    const propSet = nid();
-    ifc += propSet + "= IFCPROPERTYSET('" + generateIFCGUID() + "'," + ownerHistoryId + ",'Pset_MaterialConcrete',$,(" + propSingle1 + "," + propSingle2 + "," + propSingle3 + "," + propSingle4 + "));\n";
-
-    // Project 3D mesh to 2D screen coordinates
+            // Project 3D mesh to 2D screen coordinates
             function getMeshScreenBounds(mesh) {
                 if (!mesh.geometry) return null;
 
@@ -9957,7 +9872,14 @@
                         slabThickness: f.slabThickness,
                         height: f.height,
                         wallLoad: f.wallLoad,
-                        isRoof: f.isRoof
+                        isRoof: f.isRoof,
+                        cantilevers: f.cantilevers || { top: [], bottom: [], left: [], right: [] },
+                        customBeams: f.customBeams || [],
+                        voidSlabs: f.voidSlabs || [],
+                        deletedBeams: f.deletedBeams || [],
+                        deletedColumns: f.deletedColumns || [],
+                        lockedBeams: f.lockedBeams || [],
+                        lockedSlabs: f.lockedSlabs || []
                     })),
                     currentFloorIndex: state.currentFloorIndex || 0,
                     // Column customizations
@@ -10030,7 +9952,16 @@
 
                     // Restore floors
                     if (projectData.floors) {
-                        state.floors = projectData.floors;
+                        state.floors = projectData.floors.map(f => ({
+                            ...f,
+                            cantilevers: f.cantilevers || { top: [], bottom: [], left: [], right: [] },
+                            customBeams: f.customBeams || [],
+                            voidSlabs: f.voidSlabs || [],
+                            deletedBeams: f.deletedBeams || [],
+                            deletedColumns: f.deletedColumns || [],
+                            lockedBeams: f.lockedBeams || [],
+                            lockedSlabs: f.lockedSlabs || []
+                        }));
                     }
                     state.currentFloorIndex = projectData.currentFloorIndex || 0;
 
@@ -12474,11 +12405,10 @@ function populateBOM() {
             }
         }
 
-        // ================================================================
-        //  ETABS EXPORT (.e2k)
-        //  Compatible with ETABS v18+
-        // ================================================================
-        function generateETABSContent() {
+        // (First ETABS definition removed — superseded by later generateETABSContent/exportToETABS)
+        // (First IFC definition removed — superseded by later generateIFCGUID/generateIFCContent/exportToIFC)
+
+        function _superseded_generateETABSContent_v1() {
             let e2k = '';
             e2k += '$ ETABS MODEL FILE\n';
             e2k += '$ Generated by FutolStructure / Tributary Pro\n';
@@ -12652,29 +12582,15 @@ function populateBOM() {
             return e2k;
         }
 
-        function exportToETABS() {
-            try {
-                const e2k = generateETABSContent();
-                downloadBlob(e2k, 'TributaryPro_' + new Date().toISOString().split('T')[0] + '.e2k');
-                alert('ETABS model exported!\n\nFile includes:\n- Stories & grid lines\n- Material properties (Concrete)\n- Frame sections (columns & beams)\n- Line connectivity\n- Section assignments\n- Fixed supports\n- Load patterns (DEAD/SDL/LIVE/WALL)\n- NSCP load combinations\n\nImport via: File > Import > .e2k Text File');
-            } catch (err) {
-                console.error('ETABS export failed:', err);
-                alert('Export failed: ' + err.message);
-            }
+        function _superseded_exportToETABS_v1() {
+            // Superseded by later exportToETABS definition
         }
 
-        // ================================================================
-        //  IFC EXPORT (IFC 2x3 - Universal BIM)
-        //  Compatible with Revit, ArchiCAD, Tekla, BricsCAD
-        // ================================================================
-        function generateIFCGUID() {
-            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_$';
-            let guid = '';
-            for (let i = 0; i < 22; i++) guid += chars[Math.floor(Math.random() * 64)];
-            return guid;
+        function _superseded_generateIFCGUID_v1() {
+            // Superseded by later generateIFCGUID definition
         }
 
-        function generateIFCContent() {
+        function _superseded_generateIFCContent_v1() {
             const ts = new Date().toISOString().replace(/[-:]/g, '').split('.')[0];
             let id = 1;
             const nid = () => '#' + (id++);
@@ -12830,15 +12746,8 @@ function populateBOM() {
             return ifc;
         }
 
-        function exportToIFC() {
-            try {
-                const ifc = generateIFCContent();
-                downloadBlob(ifc, 'TributaryPro_' + new Date().toISOString().split('T')[0] + '.ifc');
-                alert('IFC model exported!\n\nFile includes:\n- Building storeys\n- Column geometry (extruded rectangles)\n- Spatial relationships\n\nOpen in: Revit, ArchiCAD, Tekla, BricsCAD, BIM Vision');
-            } catch (err) {
-                console.error('IFC export failed:', err);
-                alert('Export failed: ' + err.message);
-            }
+        function _superseded_exportToIFC_v1() {
+            // Superseded by later exportToIFC definition
         }
 
 
