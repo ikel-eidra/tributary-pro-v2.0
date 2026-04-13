@@ -4532,7 +4532,10 @@
                     cantilevers: { top: new Array(numX).fill(0), bottom: new Array(numX).fill(0), left: new Array(numY).fill(0), right: new Array(numY).fill(0) },
                     customBeams: [],
                     voidSlabs: [],
-                    deletedBeams: []
+                    deletedBeams: [],
+                    deletedColumns: [],
+                    lockedBeams: [],
+                    lockedSlabs: []
                 });
                 state.currentFloorIndex = 0;
             } else if (!state.gfSuspended && hasGF) {
@@ -4603,7 +4606,10 @@
                 },
                 customBeams: [],
                 voidSlabs: [],
-                deletedBeams: []
+                deletedBeams: [],
+                deletedColumns: [],
+                lockedBeams: [],
+                lockedSlabs: []
             };
 
             state.floors.splice(insertIndex, 0, newFloor);
@@ -4707,11 +4713,9 @@
                 const wallLoad = floor.wallLoad || 0;  // v3.0: Wall load (kN/m)
                 totalPuSum += pu;
 
-                // v3.0: Mock global cantilevers to be floor-specific for generation
-                const globalCants = state.cantilevers;
-                state.cantilevers = getCantilevers(floor.id);
-
-                // v3.0: Generate slabs and beams specific to THIS floor
+                // v3.17: Generate slabs and beams for THIS floor
+                // Cantilevers are now resolved per-floor inside generateSlabs/generateBeams
+                // (no more temporary global state.cantilevers swap)
                 generateSlabs(floor.id);
                 generateBeams(pu, wallLoad, floor);
 
@@ -4723,9 +4727,6 @@
 
                 // Step 6: Add reactions to columns for this floor
                 calculateColumnLoadsForFloor(floor.id);
-
-                // Restore global cantilevers
-                state.cantilevers = globalCants;
             }
 
             // Average pu for display (or use current floor's pu)
@@ -4746,13 +4747,10 @@
             // Update UI
             updateResults(puDisplay);
 
-            // v3.0: Final regeneration for display (Current Floor)
-            // This ensures what we see matches the selected floor tab
-            const displayCants = state.cantilevers; // UI state
-            state.cantilevers = getCantilevers(currentFloor.id);
+            // v3.17: Final regeneration for display (Current Floor)
+            // Cantilevers resolved per-floor inside generateSlabs/generateBeams
             generateSlabs(currentFloor.id);
             generateBeams(puDisplay, currentFloor.wallLoad || 0); // Use display PU
-            state.cantilevers = displayCants; // Restore UI state
 
             draw();
 
@@ -5256,15 +5254,17 @@
         }
 
         // v3.0: Generate cantilever beams (from columns) and edge beams (at cantilever tips)
-        function generateCantileverBeams(xCoords, yCoords, letters) {
+        // v3.17: Accept explicit floorCantilevers to avoid global state.cantilevers swap
+        function generateCantileverBeams(xCoords, yCoords, letters, floorCantilevers) {
+            const cants = floorCantilevers || state.cantilevers;
             const maxX = xCoords[xCoords.length - 1];
             const maxY = yCoords[yCoords.length - 1];
 
             // TOP CANTILEVERS: Beams extend from columns at yi=0 upward (negative Y)
             for (let xi = 0; xi <= state.xSpans.length; xi++) {
                 // Check if any adjacent span has a top cantilever
-                const leftCant = xi > 0 ? (state.cantilevers.top[xi - 1] || 0) : 0;
-                const rightCant = xi < state.xSpans.length ? (state.cantilevers.top[xi] || 0) : 0;
+                const leftCant = xi > 0 ? (cants.top[xi - 1] || 0) : 0;
+                const rightCant = xi < state.xSpans.length ? (cants.top[xi] || 0) : 0;
                 const maxCant = Math.max(leftCant, rightCant);
 
                 if (maxCant > 0) {
@@ -5298,7 +5298,7 @@
             // TOP EDGE BEAM: Runs along the top edge of cantilever
             let topEdgeSegments = [];
             for (let xi = 0; xi < state.xSpans.length; xi++) {
-                const cantLen = state.cantilevers.top[xi] || 0;
+                const cantLen = cants.top[xi] || 0;
                 if (cantLen > 0) {
                     topEdgeSegments.push({ xi, cantLen });
                 }
@@ -5326,8 +5326,8 @@
             // BOTTOM CANTILEVERS: Beams extend from columns at yi=last downward
             const lastYi = state.ySpans.length;
             for (let xi = 0; xi <= state.xSpans.length; xi++) {
-                const leftCant = xi > 0 ? (state.cantilevers.bottom[xi - 1] || 0) : 0;
-                const rightCant = xi < state.xSpans.length ? (state.cantilevers.bottom[xi] || 0) : 0;
+                const leftCant = xi > 0 ? (cants.bottom[xi - 1] || 0) : 0;
+                const rightCant = xi < state.xSpans.length ? (cants.bottom[xi] || 0) : 0;
                 const maxCant = Math.max(leftCant, rightCant);
 
                 if (maxCant > 0) {
@@ -5360,7 +5360,7 @@
 
             // BOTTOM EDGE BEAM
             for (let xi = 0; xi < state.xSpans.length; xi++) {
-                const cantLen = state.cantilevers.bottom[xi] || 0;
+                const cantLen = cants.bottom[xi] || 0;
                 if (cantLen > 0) {
                     state.beams.push({
                         id: `BEX-B-${xi + 1}`,
@@ -5384,8 +5384,8 @@
 
             // LEFT CANTILEVERS: Beams extend from columns at xi=0 leftward
             for (let yi = 0; yi <= state.ySpans.length; yi++) {
-                const topCant = yi > 0 ? (state.cantilevers.left[yi - 1] || 0) : 0;
-                const bottomCant = yi < state.ySpans.length ? (state.cantilevers.left[yi] || 0) : 0;
+                const topCant = yi > 0 ? (cants.left[yi - 1] || 0) : 0;
+                const bottomCant = yi < state.ySpans.length ? (cants.left[yi] || 0) : 0;
                 const maxCant = Math.max(topCant, bottomCant);
 
                 if (maxCant > 0) {
@@ -5418,7 +5418,7 @@
 
             // LEFT EDGE BEAM
             for (let yi = 0; yi < state.ySpans.length; yi++) {
-                const cantLen = state.cantilevers.left[yi] || 0;
+                const cantLen = cants.left[yi] || 0;
                 if (cantLen > 0) {
                     state.beams.push({
                         id: `BEY-L-${yi + 1}`,
@@ -5443,8 +5443,8 @@
             // RIGHT CANTILEVERS: Beams extend from columns at xi=last rightward
             const lastXi = state.xSpans.length;
             for (let yi = 0; yi <= state.ySpans.length; yi++) {
-                const topCant = yi > 0 ? (state.cantilevers.right[yi - 1] || 0) : 0;
-                const bottomCant = yi < state.ySpans.length ? (state.cantilevers.right[yi] || 0) : 0;
+                const topCant = yi > 0 ? (cants.right[yi - 1] || 0) : 0;
+                const bottomCant = yi < state.ySpans.length ? (cants.right[yi] || 0) : 0;
                 const maxCant = Math.max(topCant, bottomCant);
 
                 if (maxCant > 0) {
@@ -5477,7 +5477,7 @@
 
             // RIGHT EDGE BEAM
             for (let yi = 0; yi < state.ySpans.length; yi++) {
-                const cantLen = state.cantilevers.right[yi] || 0;
+                const cantLen = cants.right[yi] || 0;
                 if (cantLen > 0) {
                     state.beams.push({
                         id: `BEY-R-${yi + 1}`,
@@ -5587,11 +5587,12 @@
                 }
             }
 
-            // v3.0: Generate cantilever beams and edge beams
-            generateCantileverBeams(xCoords, yCoords, letters);
-
             // v3.0: Add custom (intermediate framing) beams to state.beams
             const floor = targetFloor || state.floors[state.currentFloorIndex];
+
+            // v3.17: Resolve floor cantilevers explicitly and pass to beam generation
+            const floorCantilevers = getCantilevers(floor?.id);
+            generateCantileverBeams(xCoords, yCoords, letters, floorCantilevers);
             const customBeams = floor?.customBeams || [];
             for (const cb of customBeams) {
                 let x1, y1, x2, y2, span, direction;
@@ -10053,8 +10054,12 @@
             state.ySpans = [5.0, 5.0];
             state.cantilevers = { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] };
             state.floors = [
-                { id: '2F', name: '2nd Floor', dlSuper: 2.0, liveLoad: 2.0, slabThickness: 150, height: 3.0, wallLoad: 6.0, isRoof: false },
-                { id: 'RF', name: 'Roof', dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, height: 3.0, wallLoad: 0, isRoof: true }
+                { id: '2F', name: '2nd Floor', dlSuper: 2.0, liveLoad: 2.0, slabThickness: 150, height: 3.0, wallLoad: 6.0, isRoof: false,
+                  cantilevers: { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] },
+                  customBeams: [], voidSlabs: [], deletedBeams: [], deletedColumns: [], lockedBeams: [], lockedSlabs: [] },
+                { id: 'RF', name: 'Roof', dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, height: 3.0, wallLoad: 0, isRoof: true,
+                  cantilevers: { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] },
+                  customBeams: [], voidSlabs: [], deletedBeams: [], deletedColumns: [], lockedBeams: [], lockedSlabs: [] }
             ];
             state.currentFloorIndex = 0;
             state.gfSuspended = false;
@@ -12243,15 +12248,13 @@ function populateBOM() {
             // Beams - regenerate per floor
             const oldBeams = [...state.beams];
             const oldSlabs = [...state.slabs];
-            const oldCants = JSON.parse(JSON.stringify(state.cantilevers));
             const processedBeams = new Set();
 
             state.floors.forEach((floor, fi) => {
                 const floorIdx = fi + 1;
-                // Use per-floor cantilevers
-                state.cantilevers = floor.cantilevers || oldCants;
+                // v3.17: Cantilevers resolved per-floor inside generateSlabs/generateBeams
                 if (typeof generateSlabs === 'function') generateSlabs(floor.id);
-                if (typeof generateBeams === 'function') generateBeams(1.0, floor.wallLoad || 0);
+                if (typeof generateBeams === 'function') generateBeams(1.0, floor.wallLoad || 0, floor);
 
                 state.beams.forEach(beam => {
                     if (beam.isCantilever || beam.deleted) return;
@@ -12387,7 +12390,6 @@ function populateBOM() {
             // Restore state
             state.beams = oldBeams;
             state.slabs = oldSlabs;
-            state.cantilevers = oldCants;
             if (typeof draw === 'function') draw();
 
             console.log("STAAD Export: " + existingNodes.size + " nodes, " + (memId - 1) + " members");
