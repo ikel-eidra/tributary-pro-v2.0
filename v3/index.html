@@ -3206,6 +3206,9 @@
         </button>
     </div>
 
+    <!-- ========== ENGINE MODULES ========== -->
+    <script src="engine/loads.js"></script>
+
     <!-- ========== JAVASCRIPT ========== -->
     <script>
         // ========================================
@@ -3224,6 +3227,59 @@
         function safeFloat(val, fallback) { const n = parseFloat(val); return isNaN(n) ? fallback : n; }
         function safeInt(val, fallback) { const n = parseInt(val, 10); return isNaN(n) ? fallback : n; }
         function clamp(val, min, max) { return Math.max(min, Math.min(max, val)); }
+
+        // v3.17: Build parameters object for EngineLoads module calls
+        function getLoadParams() {
+            return {
+                fc: state.fc,
+                fy: state.fy,
+                defaultColumnB: state.defaultColumnB,
+                defaultColumnH: state.defaultColumnH,
+                defaultBeamB: state.defaultBeamB,
+                defaultBeamH: state.defaultBeamH,
+                concreteDensity: state.concreteDensity,
+                floorHeight: state.floors[0]?.height || 3.0,
+                soilBearing: state.soilBearing,
+                numFloors: state.floors.length,
+                xSpans: state.xSpans,
+                ySpans: state.ySpans
+            };
+        }
+
+        /**
+         * Floor factory — single source of truth for floor object shape.
+         * @param {string} id - Floor ID (e.g. 'GF', '2F', 'RF')
+         * @param {string} name - Display name
+         * @param {number} numX - Number of X spans (for cantilever arrays)
+         * @param {number} numY - Number of Y spans (for cantilever arrays)
+         * @param {object} [opts] - Optional overrides (dlSuper, liveLoad, slabThickness, height, wallLoad, isRoof)
+         * @returns {object} A complete floor object
+         */
+        function createFloor(id, name, numX, numY, opts) {
+            const o = opts || {};
+            return {
+                id: id,
+                name: name,
+                dlSuper: o.dlSuper !== undefined ? o.dlSuper : 2.0,
+                liveLoad: o.liveLoad !== undefined ? o.liveLoad : 2.0,
+                slabThickness: o.slabThickness !== undefined ? o.slabThickness : 150,
+                height: o.height !== undefined ? o.height : 3.0,
+                wallLoad: o.wallLoad !== undefined ? o.wallLoad : 6.0,
+                isRoof: !!o.isRoof,
+                cantilevers: {
+                    top: new Array(numX).fill(0),
+                    bottom: new Array(numX).fill(0),
+                    left: new Array(numY).fill(0),
+                    right: new Array(numY).fill(0)
+                },
+                customBeams: [],
+                voidSlabs: [],
+                deletedBeams: [],
+                deletedColumns: [],
+                lockedBeams: [],
+                lockedSlabs: []
+            };
+        }
 
         // ========== STATE ==========
         const state = {
@@ -3246,16 +3302,8 @@
             //   GF tab is added dynamically when checkbox is checked
             // v3.0 FIX: Each floor has its own cantilevers, customBeams, voidSlabs, deletedBeams, deletedColumns
             floors: [
-                {
-                    id: '2F', name: '2nd Floor', dlSuper: 2.0, liveLoad: 2.0, slabThickness: 150, height: 3.0, wallLoad: 6.0, isRoof: false,
-                    cantilevers: { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] },
-                    customBeams: [], voidSlabs: [], deletedBeams: [], deletedColumns: [], lockedBeams: [], lockedSlabs: []
-                },
-                {
-                    id: 'RF', name: 'Roof', dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, height: 3.0, wallLoad: 0, isRoof: true,
-                    cantilevers: { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] },
-                    customBeams: [], voidSlabs: [], deletedBeams: [], deletedColumns: [], lockedBeams: [], lockedSlabs: []
-                }
+                createFloor('2F', '2nd Floor', 2, 2),
+                createFloor('RF', 'Roof', 2, 2, { dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, wallLoad: 0, isRoof: true })
             ],
             currentFloorIndex: 0,    // Which floor is selected
 
@@ -4137,10 +4185,7 @@
         // v3.0: Helper - Check if floorId is at or above startFloor
         // Used for planted columns (columns that start above ground)
         function isFloorAtOrAbove(floorId, startFloor) {
-            const floorIdx = state.floors.findIndex(f => f.id === floorId);
-            const startIdx = state.floors.findIndex(f => f.id === startFloor);
-            // Higher index = higher floor (GF=0, 2F=1, RF=2)
-            return floorIdx >= startIdx;
+            return EngineLoads.isFloorAtOrAbove(state.floors, floorId, startFloor);
         }
 
         // v2.7: Toggle column active state (for L/U layouts)
@@ -4175,20 +4220,7 @@
 
         // v3.0: Check if column is active on a specific floor
         function isColumnActiveOnFloor(col, floorId) {
-            if (!col) return false;
-
-            // v3.0 FIX: Planted columns are inactive on floors BELOW their startFloor
-            if (col.startFloor || col.isPlanted) {
-                const startFloorId = col.startFloor;
-                if (startFloorId && !isFloorAtOrAbove(floorId, startFloorId)) {
-                    return false;  // Column doesn't exist on floors below startFloor
-                }
-            }
-
-            if (col.activePerFloor) {
-                return col.activePerFloor[floorId] !== false;
-            }
-            return col.active !== false;
+            return EngineLoads.isColumnActiveOnFloor(col, floorId, state.floors);
         }
 
         // v3.2: Update tie beam size from input controls
@@ -4516,27 +4548,10 @@
             const hasGF = state.floors.some(f => f.id === 'GF');
 
             if (state.gfSuspended && !hasGF) {
-                // Add GF at the start with per-floor arrays
                 const elevHeight = parseFloat(document.getElementById('elevationHeight')?.value) || 1.2;
-                const numX = state.xSpans.length;
-                const numY = state.ySpans.length;
-                state.floors.unshift({
-                    id: 'GF',
-                    name: 'Ground Floor',
-                    dlSuper: 2.0,
-                    liveLoad: 2.0,
-                    slabThickness: 150,
-                    height: elevHeight,
-                    isRoof: false,
-                    // v3.0 FIX: Per-floor arrays
-                    cantilevers: { top: new Array(numX).fill(0), bottom: new Array(numX).fill(0), left: new Array(numY).fill(0), right: new Array(numY).fill(0) },
-                    customBeams: [],
-                    voidSlabs: [],
-                    deletedBeams: [],
-                    deletedColumns: [],
-                    lockedBeams: [],
-                    lockedSlabs: []
-                });
+                state.floors.unshift(
+                    createFloor('GF', 'Ground Floor', state.xSpans.length, state.ySpans.length, { height: elevHeight })
+                );
                 state.currentFloorIndex = 0;
             } else if (!state.gfSuspended && hasGF) {
                 // Remove GF from the start
@@ -4586,31 +4601,14 @@
                 }
             });
 
-            // v3.0 FIX: Initialize per-floor arrays for cantilevers, customBeams, voidSlabs
-            const numX = state.xSpans.length;
-            const numY = state.ySpans.length;
-            const newFloor = {
-                id: `${insertIndex + 1}F`,
-                name: `${insertIndex + 1}${['st', 'nd', 'rd'][insertIndex - 1] || 'th'} Floor`,
-                dlSuper: 2.0,
-                liveLoad: 2.0,
-                slabThickness: 150,
-                height: 3.0,
-                isRoof: false,
-                // v3.0 FIX: Per-floor cantilevers (start with zeros - no cantilevers)
-                cantilevers: {
-                    top: new Array(numX).fill(0),
-                    bottom: new Array(numX).fill(0),
-                    left: new Array(numY).fill(0),
-                    right: new Array(numY).fill(0)
-                },
-                customBeams: [],
-                voidSlabs: [],
-                deletedBeams: [],
-                deletedColumns: [],
-                lockedBeams: [],
-                lockedSlabs: []
-            };
+            const floorNum = insertIndex + 1;
+            const ordinal = ['st', 'nd', 'rd'][insertIndex - 1] || 'th';
+            const newFloor = createFloor(
+                `${floorNum}F`,
+                `${floorNum}${ordinal} Floor`,
+                state.xSpans.length,
+                state.ySpans.length
+            );
 
             state.floors.splice(insertIndex, 0, newFloor);
 
@@ -4759,6 +4757,47 @@
 
             // v3.16: Update professional status bar
             updateStatusBar();
+
+            // v3.17: Capture snapshot for regression checking (temporary extraction scaffold)
+            if (window._captureSnapshot) {
+                window._lastSnapshot = dumpStateSnapshot();
+            }
+        }
+
+        /**
+         * v3.17: Reference snapshot for extraction regression checking
+         * Captures calculation-relevant state fields for before/after comparison.
+         * Enable with: window._captureSnapshot = true
+         * Read with: console.log(JSON.stringify(window._lastSnapshot, null, 2))
+         */
+        function dumpStateSnapshot() {
+            return {
+                columns: state.columns.map(c => ({
+                    id: c.id, active: c.active, totalLoad: +(c.totalLoad || 0).toFixed(4),
+                    suggestedB: c.suggestedB, suggestedH: c.suggestedH,
+                    selfWeight: +(c.selfWeight || 0).toFixed(4),
+                    footingSize: +(c.footingSize || 0).toFixed(4),
+                    footingThick: +(c.footingThick || 0).toFixed(4),
+                    floorLoads: (c.floorLoads || []).map(fl => ({
+                        floorId: fl.floorId, load: +fl.load.toFixed(4)
+                    }))
+                })),
+                beams: state.beams.map(b => ({
+                    id: b.id, w: +b.w.toFixed(4),
+                    Rleft: +b.Rleft.toFixed(4), Rright: +b.Rright.toFixed(4),
+                    tributaryArea: +b.tributaryArea.toFixed(4),
+                    suggestedB: b.suggestedB, suggestedH: b.suggestedH,
+                    selfWeight: +(b.selfWeight || 0).toFixed(4)
+                })),
+                slabs: state.slabs.map(s => ({
+                    id: s.id, area: +s.area.toFixed(4),
+                    isVoid: !!s.isVoid, isTwoWay: !!s.isTwoWay
+                })),
+                tieBeamW: state.tieBeamW,
+                tieBeamH: state.tieBeamH,
+                totalColumnSelfWeight: +(state.totalColumnSelfWeight || 0).toFixed(4),
+                totalBeamSelfWeight: +(state.totalBeamSelfWeight || 0).toFixed(4)
+            };
         }
 
         /**
@@ -4801,74 +4840,9 @@
          * Simple formula: A_req = P / q_allow
          */
         function calculateFootingSizes() {
-            const q = state.soilBearing; // kPa
-            const numFloors = state.floors.length;
-            const floorHeight = state.floors[0]?.height || 3.0;
-            const footingDepth = state.footingDepth || 1.5;
-
-            // v2.8: Calculate uniform tie beam sizing from longest span
-            const longestSpan = Math.max(...state.xSpans, ...state.ySpans);
-            state.tieBeamH = Math.max(0.3, Math.ceil(longestSpan / 10 * 20) / 20);
-            state.tieBeamW = 0.25;
-
-            // v3.0: Calculate tie beam DL per column
-            // Each column has avg 2 tie beams connecting to it (simplified)
-            // Tie beam length approximated as average span
-            const avgSpan = (state.xSpans.reduce((a, b) => a + b, 0) + state.ySpans.reduce((a, b) => a + b, 0)) /
-                (state.xSpans.length + state.ySpans.length);
-            const tieBeamVolume = state.tieBeamW * state.tieBeamH * avgSpan;  // m³ per beam
-            const tieBeamWeight = tieBeamVolume * state.concreteDensity;      // kN per beam
-            const tieBeamDLPerColumn = tieBeamWeight * 1.2;  // Factored, shared contribution
-
-            for (let col of state.columns) {
-                if (col.active === false) {
-                    col.footingSize = 0;
-                    col.footingThick = 0;
-                    continue;
-                }
-
-                // v3.0: Planted columns don't get footings (load goes to transfer beam)
-                if (col.startFloor) {
-                    col.footingSize = 0;
-                    col.footingThick = 0;
-                    col.isPlanted = true;
-                    continue;
-                }
-
-                // v3.0: Add column self-weight for all floors
-                // Use suggestedB/H if available, else estimate 250×250
-                const colB = (col.suggestedB || 250) / 1000;  // m
-                const colH = (col.suggestedH || 250) / 1000;  // m
-                const colVolume = colB * colH * floorHeight;  // m³ per floor
-                const colDL = colVolume * state.concreteDensity * numFloors * 1.2;  // Factored
-
-                // Total load includes: slab+beam (from floors) + column DL + tie beam DL
-                const totalFactored = col.totalLoad + colDL + tieBeamDLPerColumn;
-                col.totalLoadWithDL = totalFactored;  // Store for display
-
-                // Use unfactored load for footing sizing (service load)
-                const P_service = totalFactored / 1.4; // kN
-
-                // Required area
-                const A_req = P_service / q; // m²
-
-                // Square footing side (round to 0.1m, min 0.6m)
-                let side = Math.sqrt(A_req);
-                side = Math.max(0.6, Math.ceil(side * 10) / 10);
-
-                // Thickness estimate (simple: h = side/4, min 0.3m)
-                let thick = Math.max(0.3, Math.round(side / 4 * 10) / 10);
-
-                col.footingSize = side;      // m
-                col.footingThick = thick;    // m
-                col.columnDL = colDL;        // kN (for breakdown)
-                col.tieBeamDL = tieBeamDLPerColumn;  // kN (for breakdown)
-
-                // v3.0: Footing self-weight (factored)
-                const footingVolume = side * side * thick;  // m³
-                col.footingDL = footingVolume * state.concreteDensity * 1.2;  // kN factored
-            }
-
+            const result = EngineLoads.calculateFootingSizes(state.columns, getLoadParams());
+            state.tieBeamW = result.tieBeamW;
+            state.tieBeamH = result.tieBeamH;
 
             designAllFootings();
             console.log(`v3.0: Self-weight included - Column DL + Tie beam DL added to footings`);
@@ -4884,39 +4858,7 @@
          * v3.0: Skip columns that are not active on this specific floor
          */
         function calculateColumnLoadsForFloor(floorId) {
-            for (let col of state.columns) {
-                // v3.0: Skip if column is planted and doesn't exist at this floor
-                if (col.startFloor && !isFloorAtOrAbove(floorId, col.startFloor)) {
-                    col.floorLoads.push({ floorId, load: 0, isPlanted: true });
-                    continue;  // Don't add any load for this floor
-                }
-
-                // v3.0: Skip if column is not active on this specific floor
-                if (!isColumnActiveOnFloor(col, floorId)) {
-                    col.floorLoads.push({ floorId, load: 0, isInactive: true });
-                    continue;  // Column removed on this floor
-                }
-
-                let floorLoad = 0;
-                let beamDL = 0;  // v3.0: Beam self-weight contribution
-                for (let beam of state.beams) {
-                    // Beam reactions (from slab loads)
-                    if (beam.startCol === col.id) floorLoad += beam.Rleft;
-                    if (beam.endCol === col.id) floorLoad += beam.Rright;
-
-                    // v3.0: Beam self-weight (half to each end)
-                    // selfWeight is total kN, factor by 1.2 for DL
-                    if (beam.selfWeight) {
-                        const halfWeight = beam.selfWeight / 2 * 1.2;  // Factored
-                        if (beam.startCol === col.id) beamDL += halfWeight;
-                        if (beam.endCol === col.id) beamDL += halfWeight;
-                    }
-                }
-                const totalFloorLoad = floorLoad + beamDL;
-                col.floorLoads.push({ floorId, load: totalFloorLoad, slabLoad: floorLoad, beamDL: beamDL });
-                col.totalLoad += totalFloorLoad;
-                col.loadPerFloor = totalFloorLoad;
-            }
+            EngineLoads.calculateColumnLoadsForFloor(state.columns, state.beams, state.floors, floorId);
         }
 
         /**
@@ -5963,27 +5905,7 @@
          * v3.0: Cantilever beams - all load goes to support column
          */
         function calculateBeamReactions() {
-            for (let beam of state.beams) {
-                if (beam.isCantilever) {
-                    // Cantilever beam: all load goes to the support (connected) end
-                    const totalLoad = beam.w * beam.span;
-                    if (beam.startCol) {
-                        beam.Rleft = totalLoad;
-                        beam.Rright = 0;
-                    } else {
-                        beam.Rleft = 0;
-                        beam.Rright = totalLoad;
-                    }
-                } else if (beam.isEdgeBeam) {
-                    // Edge beam: load goes to adjacent cantilever beams (handled separately)
-                    beam.Rleft = beam.w * beam.span / 2;
-                    beam.Rright = beam.w * beam.span / 2;
-                } else {
-                    // Simply supported beam with uniform load: R = w * L / 2
-                    beam.Rleft = beam.w * beam.span / 2;
-                    beam.Rright = beam.w * beam.span / 2;
-                }
-            }
+            EngineLoads.calculateBeamReactions(state.beams);
         }
 
         /**
@@ -6060,143 +5982,17 @@
          * @returns {object} { b, h, Ast, selfWeight_kN, isOverride }
          */
         function sizeColumn(Pu_kN, height_m = 3.0) {
-            const phi = 0.65;  // NSCP reduction factor for tied columns
-            const rho = 0.01;  // 1% minimum steel ratio (NSCP 410.6.1.1)
-            const rho_max = 0.08;  // 8% maximum steel ratio (NSCP 410.6.1.1)
-            const fc = state.fc;  // MPa
-            const fy = state.fy;  // MPa
-            const Pu = Pu_kN * 1000;  // Convert kN to N
-
-            let b, h;
-            let isOverride = false;
-            let capacityRatio = 0;
-            let slendernessRatio = 0;
-
-            // v3.0: Check for user override (rectangular columns)
-            if (state.defaultColumnB > 0) {
-                b = state.defaultColumnB;
-                h = state.defaultColumnH > 0 ? state.defaultColumnH : b;  // h=0 means square
-                isOverride = true;
-            } else {
-                // Required gross area (mm²) per NSCP 410.3.5.2
-                // Pn = 0.80 * [0.85 * f'c * (Ag - Ast) + fy * Ast]
-                // Pu = phi * Pn
-                const Ag_required = Pu / (phi * 0.80 * (0.85 * fc * (1 - rho) + fy * rho));
-
-                // Size as square column, round up to nearest 50mm
-                let side = Math.ceil(Math.sqrt(Math.max(0, Ag_required)) / 50) * 50;
-                side = Math.max(side, 200);  // Minimum 200mm per NSCP 410.3.1
-                b = side;
-                h = side;
-            }
-
-            // Actual gross area and required steel
-            const Ag_actual = b * h;
-            const Ast = Math.ceil(rho * Ag_actual);
-
-            // v3.16: Capacity check (DCR - demand/capacity ratio)
-            const Pn_max = phi * 0.80 * (0.85 * fc * (Ag_actual - Ast) + fy * Ast) / 1000; // kN
-            capacityRatio = Pn_max > 0 ? Pu_kN / Pn_max : 0;
-
-            // v3.16: Slenderness ratio check (klu/r)
-            const lu = height_m * 1000; // unsupported length in mm
-            const r = Math.min(b, h) * 0.3; // radius of gyration (0.3h for rectangular)
-            const k = 1.0; // effective length factor (braced frame)
-            slendernessRatio = r > 0 ? (k * lu) / r : 0;
-
-            // v3.0: Calculate column self-weight
-            const volume_m3 = (b / 1000) * (h / 1000) * height_m;
-            const selfWeight_kN = volume_m3 * state.concreteDensity;
-
-            return {
-                b, h, Ast, selfWeight_kN, isOverride,
-                capacityRatio,
-                slendernessRatio,
-                isSlender: slendernessRatio > 22, // NSCP 410.10.1 limit for braced frames
-                Pn_max_kN: Pn_max
-            };
+            return EngineLoads.sizeColumn(Pu_kN, height_m, getLoadParams());
         }
 
-        /**
-         * Size a beam based on span-to-depth ratio (NSCP Table 409.3.1.1)
-         * v3.0: Respects user-provided dimensions when defaultBeamH > 0
-         * @param {number} span_m - Beam span in meters
-         * @param {boolean} isCantilever - Is this a cantilever beam?
-         * @returns {object} { b: width in mm, h: depth in mm }
-         */
         function sizeBeam(span_m, isCantilever = false) {
-            let b, h;
-
-            // v3.0: If user specified beam depth, use it
-            if (state.defaultBeamH > 0) {
-                h = state.defaultBeamH;
-                b = state.defaultBeamB || 250;
-            } else {
-                // Auto-size using NSCP Table 409.3.1.1 (minimum thickness)
-                // One end continuous: L/18.5, Both ends continuous: L/21
-                // Simply supported: L/16, Cantilever: L/8
-                const L = span_m * 1000;  // Convert to mm
-
-                const minDepthRatio = isCantilever ? 8 : 16;
-                h = Math.ceil((L / minDepthRatio) / 50) * 50;  // Round to 50mm
-                h = Math.max(h, 300);  // Minimum 300mm depth
-
-                // Width: minimum 200mm, typically b >= 0.3h for ductile frames (NSCP 421.5.1.3)
-                b = state.defaultBeamB > 0
-                    ? state.defaultBeamB
-                    : Math.max(200, Math.ceil((h * 0.4) / 50) * 50);
-            }
-
-            // v3.16: Aspect ratio check (h/b should be <= 3 for ductile beams per NSCP 421.5.1.3)
-            const aspectRatio = h / b;
-            const spanToDepthRatio = (span_m * 1000) / h;
-
-            return {
-                b, h,
-                aspectRatio,
-                spanToDepthRatio,
-                isAdequate: spanToDepthRatio <= (isCantilever ? 8 : 16)
-            };
+            return EngineLoads.sizeBeam(span_m, isCantilever, getLoadParams());
         }
 
-        /**
-         * Apply sizing to all columns and beams
-         * v3.0: Also calculates self-weight dead load
-         */
         function sizeMembers() {
-            // Size all columns based on their total load
-            let totalColumnSelfWeight = 0;
-            for (let col of state.columns) {
-                if (col.active === false) continue;
-                const height = state.floors[0]?.height || 3.0;  // Use first floor height
-                const sizing = sizeColumn(col.totalLoad, height);
-                col.suggestedB = sizing.b;
-                col.suggestedH = sizing.h;
-                col.suggestedAst = sizing.Ast;
-                col.selfWeight = sizing.selfWeight_kN;
-                col.isOverride = sizing.isOverride;
-                totalColumnSelfWeight += col.selfWeight;
-            }
-            state.totalColumnSelfWeight = totalColumnSelfWeight;
-
-            // Size all beams based on their span
-            let totalBeamSelfWeight = 0;
-            for (let beam of state.beams) {
-                const sizing = sizeBeam(beam.span, beam.isCantilever || false);
-                beam.suggestedB = sizing.b;
-                beam.suggestedH = sizing.h;
-
-                // v3.0: Calculate beam self-weight
-                // Volume = b × h × span, Weight = γc × Volume
-                const bM = sizing.b / 1000;  // Convert mm to m
-                const hM = sizing.h / 1000;  // Convert mm to m
-                beam.selfWeight = state.concreteDensity * bM * hM * beam.span;  // kN total
-                beam.selfWeightPerM = state.concreteDensity * bM * hM;  // kN/m
-                totalBeamSelfWeight += beam.selfWeight;
-            }
-
-            // Store total self-weight for display
-            state.totalBeamSelfWeight = totalBeamSelfWeight;
+            const result = EngineLoads.sizeMembers(state.columns, state.beams, getLoadParams());
+            state.totalColumnSelfWeight = result.totalColumnSelfWeight;
+            state.totalBeamSelfWeight = result.totalBeamSelfWeight;
         }
 
         // ========== UI UPDATES ==========
@@ -10054,12 +9850,8 @@
             state.ySpans = [5.0, 5.0];
             state.cantilevers = { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] };
             state.floors = [
-                { id: '2F', name: '2nd Floor', dlSuper: 2.0, liveLoad: 2.0, slabThickness: 150, height: 3.0, wallLoad: 6.0, isRoof: false,
-                  cantilevers: { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] },
-                  customBeams: [], voidSlabs: [], deletedBeams: [], deletedColumns: [], lockedBeams: [], lockedSlabs: [] },
-                { id: 'RF', name: 'Roof', dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, height: 3.0, wallLoad: 0, isRoof: true,
-                  cantilevers: { top: [0, 0], bottom: [0, 0], left: [0, 0], right: [0, 0] },
-                  customBeams: [], voidSlabs: [], deletedBeams: [], deletedColumns: [], lockedBeams: [], lockedSlabs: [] }
+                createFloor('2F', '2nd Floor', 2, 2),
+                createFloor('RF', 'Roof', 2, 2, { dlSuper: 1.5, liveLoad: 1.0, slabThickness: 120, wallLoad: 0, isRoof: true })
             ];
             state.currentFloorIndex = 0;
             state.gfSuspended = false;
@@ -11981,157 +11773,22 @@ function populateBOM() {
 
 
 // ========== FOOTING STRUCTURAL DESIGN (NSCP 2015 / ACI 318-14) ==========
-        // Checks: sizing, punching shear, wide-beam shear, flexure, reinforcement
-        // Called after calculateFootingSizes() to add structural checks
-
+        // Delegated to EngineLoads.designFooting (engine/loads.js)
         function designFooting(col) {
-            if (!col.footingSize || col.footingSize <= 0) return;
-
-            const fc = state.fc || 21;        // MPa
-            const fy = state.fy || 415;       // MPa
-            const gamma_c = 24;               // kN/m³
-            const phi_v = 0.75;               // Shear reduction factor
-            const phi_b = 0.90;               // Flexure reduction factor
-            const cover = 75;                 // mm concrete cover (soil contact)
-            const barDia = 16;                // mm main rebar diameter
-            const d_guess = (col.footingThick || 0.3) * 1000 - cover - barDia / 2; // effective depth mm
-
-            const L = col.footingSize;        // m (square footing side)
-            const Pu = col.totalLoadWithDL || col.totalLoad || 0; // kN (factored)
-            const colB = (col.suggestedB || 250) / 1000; // m
-            const colH = (col.suggestedH || 250) / 1000; // m
-
-            // ------- Step 1: Net upward soil pressure -------
-            const qu = Pu / (L * L); // kPa (factored)
-
-            // ------- Step 2: Footing Thickness by Punching Shear (ACI 318-14 §22.6) -------
-            // Critical perimeter at d/2 from column face
-            let d = d_guess; // mm, iterate
-
-            for (let iter = 0; iter < 5; iter++) {
-                const d_m = d / 1000; // in meters
-                const bo = 2 * ((colB + d_m) + (colH + d_m)); // m - perimeter
-                const Ap = (colB + d_m) * (colH + d_m); // m² - punching area
-                const Vu_punch = Pu - qu * Ap; // kN
-
-                // ACI 318 §22.6.5.2: Vc = min of three equations
-                const beta_c = Math.max(colH, colB) / Math.min(colH, colB); // aspect ratio
-                const lambda = 1.0; // normal weight concrete
-                const Vc1 = 0.33 * lambda * Math.sqrt(fc) * bo * d / 1000; // kN
-                const Vc2 = (0.17 * (1 + 2 / beta_c)) * lambda * Math.sqrt(fc) * bo * d / 1000;
-                const alpha_s = 40; // interior column
-                const Vc3 = (0.083 * (alpha_s * d / (bo * 1000) + 2)) * lambda * Math.sqrt(fc) * bo * d / 1000;
-                const Vc = Math.min(Vc1, Vc2, Vc3);
-                const phiVc = phi_v * Vc;
-
-                if (phiVc >= Vu_punch) {
-                    break; // OK
-                } else {
-                    // Increase d by 25mm and try again
-                    d += 25;
-                }
-            }
-
-            // ------- Step 3: Wide-Beam (One-Way) Shear Check (ACI 318-14 §22.5) -------
-            // Critical section at d from column face
-            const d_m = d / 1000;
-            const cantilever = (L - colB) / 2; // m - projection from column face
-            const Vu_wide = qu * L * (cantilever - d_m); // kN
-            const Vc_wide = 0.17 * 1.0 * Math.sqrt(fc) * (L * 1000) * d / 1000; // kN
-            const phiVc_wide = phi_v * Vc_wide;
-
-            let wideBeamOK = phiVc_wide >= Vu_wide;
-
-            // If wide beam shear fails, increase d
-            while (!wideBeamOK && d < 1500) {
-                d += 25;
-                const d_m2 = d / 1000;
-                const Vu2 = qu * L * (cantilever - d_m2);
-                const Vc2 = 0.17 * Math.sqrt(fc) * (L * 1000) * d / 1000;
-                wideBeamOK = (phi_v * Vc2) >= Vu2;
-            }
-
-            // ------- Step 4: Required Footing Thickness -------
-            const hReq = d + cover + barDia / 2; // mm
-            const hFinal = Math.max(300, Math.ceil(hReq / 50) * 50); // round up to 50mm
-            const dFinal = hFinal - cover - barDia / 2;  // final effective depth
-
-            // ------- Step 5: Flexural Reinforcement (ACI 318-14 §13.3.3) -------
-            // Critical section at face of column
-            const Mu = qu * L * Math.pow(cantilever, 2) / 2; // kN·m per meter width
-            // Actually Mu total = qu * L * (L-colB)²/8 for full footing width
-            const Mu_total = qu * L * Math.pow((L - colB) / 2, 2) / 2; // kN·m
-
-            // Rn = Mu / (phi * b * d²)
-            const b_mm = L * 1000; // mm (full width)
-            const Rn = (Mu_total * 1e6) / (phi_b * b_mm * dFinal * dFinal); // MPa
-
-            // rho = 0.85*fc/fy * (1 - sqrt(1 - 2*Rn/(0.85*fc)))
-            const discriminant = 1 - (2 * Rn) / (0.85 * fc);
-            let rho;
-            if (discriminant > 0) {
-                rho = (0.85 * fc / fy) * (1 - Math.sqrt(discriminant));
-            } else {
-                rho = 0.85 * fc / fy * 0.5; // fallback
-            }
-
-            // Minimum reinforcement for footings: rho_min = 0.0018 (Grade 60) or 0.0020 (Grade 40)
-            const rho_min = fy >= 400 ? 0.0018 : 0.0020;
-            rho = Math.max(rho, rho_min);
-
-            // Required steel area
-            const As_req = rho * b_mm * dFinal; // mm²
-
-            // Calculate number of bars
-            const Ab = Math.PI * barDia * barDia / 4; // area per bar
-            const nBars = Math.ceil(As_req / Ab);
-
-            // Spacing
-            const spacing = Math.floor((b_mm - 2 * cover) / (nBars - 1));
-
-            // ------- Step 6: Store Results -------
-            col.footingDesign = {
-                L: L,                           // m - footing side length
-                h: hFinal,                      // mm - total thickness
-                d: dFinal,                      // mm - effective depth
-                qu: qu.toFixed(1),              // kPa - factored soil pressure
-                // Punching shear
-                punchingVu: (Pu - qu * ((colB + dFinal / 1000) * (colH + dFinal / 1000))).toFixed(1),
-                punchingPhiVc: (phi_v * Math.min(
-                    0.33 * Math.sqrt(fc) * 2 * ((colB + dFinal / 1000) + (colH + dFinal / 1000)) * dFinal / 1000,
-                    (0.17 * (1 + 2 / (Math.max(colH, colB) / Math.min(colH, colB)))) * Math.sqrt(fc) * 2 * ((colB + dFinal / 1000) + (colH + dFinal / 1000)) * dFinal / 1000
-                )).toFixed(1),
-                punchingOK: true,
-                // Wide beam shear
-                wideVu: (qu * L * ((L - colB) / 2 - dFinal / 1000)).toFixed(1),
-                widePhiVc: (phi_v * 0.17 * Math.sqrt(fc) * b_mm * dFinal / 1000).toFixed(1),
-                wideOK: wideBeamOK,
-                // Flexure
-                Mu: Mu_total.toFixed(1),        // kN·m
-                rho: (rho * 100).toFixed(3),    // percentage
-                As: As_req.toFixed(0),          // mm²
-                nBars: nBars,
-                barDia: barDia,
-                spacing: spacing,
-                rebarStr: nBars + '-ø' + barDia + 'mm @ ' + spacing + 'mm c/c EW'
-            };
-
-            // Update footing thickness on column
-            col.footingThick = hFinal / 1000;
-
-            return col.footingDesign;
+            return EngineLoads.designFooting(col, getLoadParams());
         }
 
         /**
-         * Run footing design for all columns after sizing
+         * Run footing design for all columns after sizing.
+         * Calculation delegated to EngineLoads; DOM update kept here.
          */
         function designAllFootings() {
+            const params = getLoadParams();
             state.columns.forEach(col => {
                 if (col.active !== false && col.footingSize > 0 && !col.isPlanted) {
-                    designFooting(col);
+                    EngineLoads.designFooting(col, params);
                 }
             });
-            // Update footing schedule display if visible
             if (typeof populateFootingSchedule === 'function') {
                 try { populateFootingSchedule(); } catch (e) { }
             }
