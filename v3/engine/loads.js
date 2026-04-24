@@ -91,7 +91,11 @@ const EngineLoads = (function () {
 
             // Size as square column, round up to nearest 50mm
             let side = Math.ceil(Math.sqrt(Math.max(0, Ag_required)) / 50) * 50;
-            side = Math.max(side, 200);  // Minimum 200mm per NSCP 410.3.1
+            const codeMinimumSide = Number(params.minColumnSideMm) > 0 ? Number(params.minColumnSideMm) : 200;
+            const practicalMinimumSide = Number(params.practicalColumnSideMm) > 0 ? Number(params.practicalColumnSideMm) : 300;
+            // Auto sizing respects both: code minimum as the hard floor, practical
+            // residential minimum as the normal baseline, then axial demand above that.
+            side = Math.max(side, codeMinimumSide, practicalMinimumSide);
             b = side;
             h = side;
         }
@@ -168,26 +172,41 @@ const EngineLoads = (function () {
      * @returns {object} { totalColumnSelfWeight, totalBeamSelfWeight }
      */
     function sizeMembers(columns, beams, params) {
+        const positiveNumber = value => {
+            const n = Number(value);
+            return Number.isFinite(n) && n > 0 ? n : null;
+        };
+
         let totalColumnSelfWeight = 0;
         for (let col of columns) {
             if (col.active === false) continue;
             const sizing = sizeColumn(col.totalLoad, params.floorHeight, params);
-            col.suggestedB = sizing.b;
-            col.suggestedH = sizing.h;
+            const manualB = positiveNumber(col.webB) || positiveNumber(col.overrideB) || positiveNumber(col.b);
+            const manualH = positiveNumber(col.webD) || positiveNumber(col.overrideH) || positiveNumber(col.h);
+            const b = manualB || sizing.b;
+            const h = manualH || manualB || sizing.h;
+
+            col.suggestedB = b;
+            col.suggestedH = h;
             col.suggestedAst = sizing.Ast;
-            col.selfWeight = sizing.selfWeight_kN;
-            col.isOverride = sizing.isOverride;
-            totalColumnSelfWeight += sizing.selfWeight_kN;
+            col.selfWeight = params.concreteDensity * (b / 1000) * (h / 1000) * params.floorHeight;
+            col.isOverride = sizing.isOverride || !!manualB || !!manualH;
+            totalColumnSelfWeight += col.selfWeight;
         }
 
         let totalBeamSelfWeight = 0;
         for (let beam of beams) {
             const sizing = sizeBeam(beam.span, beam.isCantilever || false, params);
-            beam.suggestedB = sizing.b;
-            beam.suggestedH = sizing.h;
+            const manualB = positiveNumber(beam.webW) || positiveNumber(beam.overrideB) || positiveNumber(beam.b);
+            const manualH = positiveNumber(beam.webD) || positiveNumber(beam.overrideH) || positiveNumber(beam.h);
+            const b = manualB || sizing.b;
+            const h = manualH || sizing.h;
 
-            const bM = sizing.b / 1000;
-            const hM = sizing.h / 1000;
+            beam.suggestedB = b;
+            beam.suggestedH = h;
+
+            const bM = b / 1000;
+            const hM = h / 1000;
             beam.selfWeight = params.concreteDensity * bM * hM * beam.span;
             beam.selfWeightPerM = params.concreteDensity * bM * hM;
             totalBeamSelfWeight += beam.selfWeight;
@@ -280,10 +299,16 @@ const EngineLoads = (function () {
     function calculateFootingSizes(columns, params) {
         const q = params.soilBearing;
 
-        // Tie beam sizing from longest span
+        // Tie beam sizing from longest span unless manually set in the app.
         const longestSpan = Math.max(...params.xSpans, ...params.ySpans);
-        const tieBeamH = Math.max(0.3, Math.ceil(longestSpan / 10 * 20) / 20);
-        const tieBeamW = 0.25;
+        const manualTieBeamW = Number(params.tieBeamWidth);
+        const manualTieBeamH = Number(params.tieBeamDepth);
+        const tieBeamH = Number.isFinite(manualTieBeamH) && manualTieBeamH > 0
+            ? manualTieBeamH / 1000
+            : Math.max(0.3, Math.ceil(longestSpan / 10 * 20) / 20);
+        const tieBeamW = Number.isFinite(manualTieBeamW) && manualTieBeamW > 0
+            ? manualTieBeamW / 1000
+            : 0.25;
 
         // Tie beam DL per column
         const avgSpan = (params.xSpans.reduce((a, b) => a + b, 0) + params.ySpans.reduce((a, b) => a + b, 0)) /
@@ -320,7 +345,10 @@ const EngineLoads = (function () {
             let side = Math.sqrt(A_req);
             side = Math.max(0.6, Math.ceil(side * 10) / 10);
 
-            let thick = Math.max(0.3, Math.round(side / 4 * 10) / 10);
+            const fixedThicknessMm = Number(params.fixedFootingThicknessMm);
+            const thick = Number.isFinite(fixedThicknessMm) && fixedThicknessMm > 0
+                ? Math.max(0.3, fixedThicknessMm / 1000)
+                : Math.max(0.3, Math.round(side / 4 * 10) / 10);
 
             col.footingSize = side;
             col.footingThick = thick;
@@ -347,28 +375,22 @@ const EngineLoads = (function () {
 
         const fc = params.fc || 21;
         const fy = params.fy || 415;
-        const gamma_c = 24;
         const phi_v = 0.75;
         const phi_b = 0.90;
         const cover = 75;
         const barDia = 16;
-        const d_guess = (col.footingThick || 0.3) * 1000 - cover - barDia / 2;
-
-        const L = col.footingSize;
         const Pu = col.totalLoadWithDL || col.totalLoad || 0;
         const colB = (col.suggestedB || 250) / 1000;
         const colH = (col.suggestedH || 250) / 1000;
+        const fixedThicknessMm = Number(params.fixedFootingThicknessMm);
+        const widthFirst = !!params.preferFootingWidthOverDepth && Number.isFinite(fixedThicknessMm) && fixedThicknessMm >= 300;
 
-        const qu = Pu / (L * L);
-
-        // Punching shear iteration
-        let d = d_guess;
-        for (let iter = 0; iter < 5; iter++) {
+        function evaluateShear(side, d) {
+            const qu = Pu / (side * side);
             const d_m = d / 1000;
             const bo = 2 * ((colB + d_m) + (colH + d_m));
             const Ap = (colB + d_m) * (colH + d_m);
             const Vu_punch = Pu - qu * Ap;
-
             const beta_c = Math.max(colH, colB) / Math.min(colH, colB);
             const lambda = 1.0;
             const Vc1 = 0.33 * lambda * Math.sqrt(fc) * bo * d / 1000;
@@ -378,36 +400,58 @@ const EngineLoads = (function () {
             const Vc = Math.min(Vc1, Vc2, Vc3);
             const phiVc = phi_v * Vc;
 
-            if (phiVc >= Vu_punch) {
-                break;
-            } else {
+            const cantilever = Math.max(0, (side - colB) / 2);
+            const Vu_wide = Math.max(0, qu * side * (cantilever - d_m));
+            const Vc_wide = 0.17 * Math.sqrt(fc) * (side * 1000) * d / 1000;
+            const phiVc_wide = phi_v * Vc_wide;
+
+            return {
+                qu,
+                punchingVu: Vu_punch,
+                punchingPhiVc: phiVc,
+                punchingOK: phiVc >= Vu_punch,
+                wideVu: Vu_wide,
+                widePhiVc: phiVc_wide,
+                wideOK: phiVc_wide >= Vu_wide
+            };
+        }
+
+        let L = col.footingSize;
+        let hFinal;
+        let dFinal;
+        let shear;
+        let widenedForFixedDepth = false;
+
+        if (widthFirst) {
+            hFinal = fixedThicknessMm;
+            dFinal = hFinal - cover - barDia / 2;
+            shear = evaluateShear(L, dFinal);
+            // Keep residential preliminary footing size governed by soil bearing.
+            // If 300mm thickness does not satisfy shear, report it instead of
+            // silently creating an impractically wide footing.
+        } else {
+            let d = (col.footingThick || 0.3) * 1000 - cover - barDia / 2;
+
+            for (let iter = 0; iter < 5; iter++) {
+                shear = evaluateShear(L, d);
+                if (shear.punchingOK) break;
                 d += 25;
             }
+
+            shear = evaluateShear(L, d);
+            while (!shear.wideOK && d < 1500) {
+                d += 25;
+                shear = evaluateShear(L, d);
+            }
+
+            const hReq = d + cover + barDia / 2;
+            hFinal = Math.max(300, Math.ceil(hReq / 50) * 50);
+            dFinal = hFinal - cover - barDia / 2;
+            shear = evaluateShear(L, dFinal);
         }
-
-        // Wide-beam shear
-        const d_m = d / 1000;
-        const cantilever = (L - colB) / 2;
-        const Vu_wide = qu * L * (cantilever - d_m);
-        const Vc_wide = 0.17 * 1.0 * Math.sqrt(fc) * (L * 1000) * d / 1000;
-        const phiVc_wide = phi_v * Vc_wide;
-
-        let wideBeamOK = phiVc_wide >= Vu_wide;
-
-        while (!wideBeamOK && d < 1500) {
-            d += 25;
-            const d_m2 = d / 1000;
-            const Vu2 = qu * L * (cantilever - d_m2);
-            const Vc2 = 0.17 * Math.sqrt(fc) * (L * 1000) * d / 1000;
-            wideBeamOK = (phi_v * Vc2) >= Vu2;
-        }
-
-        // Required thickness
-        const hReq = d + cover + barDia / 2;
-        const hFinal = Math.max(300, Math.ceil(hReq / 50) * 50);
-        const dFinal = hFinal - cover - barDia / 2;
 
         // Flexural reinforcement
+        const qu = shear.qu;
         const Mu_total = qu * L * Math.pow((L - colB) / 2, 2) / 2;
         const b_mm = L * 1000;
         const Rn = (Mu_total * 1e6) / (phi_b * b_mm * dFinal * dFinal);
@@ -425,7 +469,7 @@ const EngineLoads = (function () {
 
         const As_req = rho * b_mm * dFinal;
         const Ab = Math.PI * barDia * barDia / 4;
-        const nBars = Math.ceil(As_req / Ab);
+        const nBars = Math.max(2, Math.ceil(As_req / Ab));
         const spacing = Math.floor((b_mm - 2 * cover) / (nBars - 1));
 
         col.footingDesign = {
@@ -433,22 +477,22 @@ const EngineLoads = (function () {
             h: hFinal,
             d: dFinal,
             qu: qu.toFixed(1),
-            punchingVu: (Pu - qu * ((colB + dFinal / 1000) * (colH + dFinal / 1000))).toFixed(1),
-            punchingPhiVc: (phi_v * Math.min(
-                0.33 * Math.sqrt(fc) * 2 * ((colB + dFinal / 1000) + (colH + dFinal / 1000)) * dFinal / 1000,
-                (0.17 * (1 + 2 / (Math.max(colH, colB) / Math.min(colH, colB)))) * Math.sqrt(fc) * 2 * ((colB + dFinal / 1000) + (colH + dFinal / 1000)) * dFinal / 1000
-            )).toFixed(1),
-            punchingOK: true,
-            wideVu: (qu * L * ((L - colB) / 2 - dFinal / 1000)).toFixed(1),
-            widePhiVc: (phi_v * 0.17 * Math.sqrt(fc) * b_mm * dFinal / 1000).toFixed(1),
-            wideOK: wideBeamOK,
+            punchingVu: shear.punchingVu.toFixed(1),
+            punchingPhiVc: shear.punchingPhiVc.toFixed(1),
+            punchingOK: shear.punchingOK,
+            wideVu: shear.wideVu.toFixed(1),
+            widePhiVc: shear.widePhiVc.toFixed(1),
+            wideOK: shear.wideOK,
             Mu: Mu_total.toFixed(1),
             rho: (rho * 100).toFixed(3),
             As: As_req.toFixed(0),
             nBars: nBars,
             barDia: barDia,
             spacing: spacing,
-            rebarStr: nBars + '-ø' + barDia + 'mm @ ' + spacing + 'mm c/c EW'
+            rebarStr: nBars + '-ø' + barDia + 'mm @ ' + spacing + 'mm c/c EW',
+            thicknessPolicy: widthFirst ? '300mm fixed residential preliminary; bearing-sized with shear review' : 'depth-by-shear preliminary',
+            widenedForFixedDepth,
+            requiresDepthReview: widthFirst && !(shear.punchingOK && shear.wideOK)
         };
 
         col.footingThick = hFinal / 1000;
